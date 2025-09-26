@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>修复测试页面</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 10px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .test-button:hover {
+            background: #0056b3;
+        }
+        .test-result {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔧 Electron 应用修复测试</h1>
+    
+    <div class="test-section">
+        <h2>1. API 可用性测试</h2>
+        <button class="test-button" onclick="testElectronAPI()">测试 electronAPI</button>
+        <button class="test-button" onclick="testProcessExcelFile()">测试 processExcelFile</button>
+        <button class="test-button" onclick="testAuthStatus()">测试认证状态</button>
+        <div id="api-results"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>2. 函数可用性测试</h2>
+        <button class="test-button" onclick="testDashboardFunctions()">测试仪表板函数</button>
+        <div id="function-results"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>3. 文件上传测试</h2>
+        <input type="file" id="test-file-input" accept=".xlsx,.xls">
+        <button class="test-button" onclick="testFileUpload()">测试文件上传</button>
+        <div id="upload-results"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>4. 界面元素测试</h2>
+        <button class="test-button" onclick="testUIElements()">测试界面元素</button>
+        <div id="ui-results"></div>
+    </div>
+
+    <script>
+        function addResult(containerId, message, type = 'info') {
+            const container = document.getElementById(containerId);
+            const result = document.createElement('div');
+            result.className = `test-result ${type}`;
+            result.textContent = `${new Date().toLocaleTimeString()}: ${message}`;
+            container.appendChild(result);
+        }
+
+        function testElectronAPI() {
+            const container = 'api-results';
+            
+            if (typeof window.electronAPI !== 'undefined') {
+                addResult(container, '✅ electronAPI 可用', 'success');
+                
+                // 测试各个 API 方法
+                const apis = [
+                    'getAppVersion',
+                    'processExcelFile', 
+                    'getAuthStatus',
+                    'showNotification'
+                ];
+                
+                apis.forEach(api => {
+                    if (window.electronAPI[api]) {
+                        addResult(container, `✅ ${api} 方法存在`, 'success');
+                    } else {
+                        addResult(container, `❌ ${api} 方法不存在`, 'error');
+                    }
+                });
+                
+                // 测试 automation 子对象
+                if (window.electronAPI.automation) {
+                    addResult(container, '✅ automation 对象存在', 'success');
+                    
+                    const automationAPIs = [
+                        'getAuthStatus',
+                        'processExcelFile',
+                        'getAvailableTasks'
+                    ];
+                    
+                    automationAPIs.forEach(api => {
+                        if (window.electronAPI.automation[api]) {
+                            addResult(container, `✅ automation.${api} 方法存在`, 'success');
+                        } else {
+                            addResult(container, `❌ automation.${api} 方法不存在`, 'error');
+                        }
+                    });
+                } else {
+                    addResult(container, '❌ automation 对象不存在', 'error');
+                }
+            } else {
+                addResult(container, '❌ electronAPI 不可用', 'error');
+            }
+        }
+
+        async function testProcessExcelFile() {
+            const container = 'api-results';
+            
+            try {
+                if (window.electronAPI && window.electronAPI.processExcelFile) {
+                    addResult(container, '🧪 测试 processExcelFile (使用虚拟路径)', 'info');
+                    
+                    // 使用一个不存在的文件路径进行测试
+                    const result = await window.electronAPI.processExcelFile('test.xlsx');
+                    addResult(container, '✅ processExcelFile 调用成功', 'success');
+                } else {
+                    addResult(container, '❌ processExcelFile 不可用', 'error');
+                }
+            } catch (error) {
+                addResult(container, `⚠️ processExcelFile 调用失败: ${error.message}`, 'error');
+            }
+        }
+
+        async function testAuthStatus() {
+            const container = 'api-results';
+            
+            try {
+                if (window.electronAPI && window.electronAPI.getAuthStatus) {
+                    const authStatus = await window.electronAPI.getAuthStatus();
+                    addResult(container, `✅ 认证状态: ${JSON.stringify(authStatus)}`, 'success');
+                } else {
+                    addResult(container, '❌ getAuthStatus 不可用', 'error');
+                }
+            } catch (error) {
+                addResult(container, `❌ 获取认证状态失败: ${error.message}`, 'error');
+            }
+        }
+
+        function testDashboardFunctions() {
+            const container = 'function-results';
+            
+            // 测试是否存在全局 dashboard 对象
+            if (typeof window.dashboard !== 'undefined') {
+                addResult(container, '✅ dashboard 对象存在', 'success');
+                
+                const methods = [
+                    'loadSettingsUI',
+                    'updateProjectList', 
+                    'refreshProjects',
+                    'enableTaskButtons',
+                    'checkAuthStatus'
+                ];
+                
+                methods.forEach(method => {
+                    if (typeof window.dashboard[method] === 'function') {
+                        addResult(container, `✅ ${method} 方法存在`, 'success');
+                    } else {
+                        addResult(container, `❌ ${method} 方法不存在`, 'error');
+                    }
+                });
+            } else {
+                addResult(container, '❌ dashboard 对象不存在', 'error');
+            }
+        }
+
+        function testFileUpload() {
+            const container = 'upload-results';
+            const fileInput = document.getElementById('test-file-input');
+            
+            if (fileInput.files.length === 0) {
+                addResult(container, '⚠️ 请先选择一个文件', 'error');
+                return;
+            }
+            
+            const file = fileInput.files[0];
+            addResult(container, `🧪 测试文件: ${file.name}`, 'info');
+            
+            if (typeof window.dashboard !== 'undefined' && window.dashboard.handleFileUpload) {
+                try {
+                    window.dashboard.handleFileUpload(file);
+                    addResult(container, '✅ handleFileUpload 调用成功', 'success');
+                } catch (error) {
+                    addResult(container, `❌ handleFileUpload 调用失败: ${error.message}`, 'error');
+                }
+            } else {
+                addResult(container, '❌ handleFileUpload 方法不可用', 'error');
+            }
+        }
+
+        function testUIElements() {
+            const container = 'ui-results';
+            
+            const elements = [
+                'current-user',
+                'login-btn',
+                'refresh-auth',
+                'connection-indicator',
+                'connection-text'
+            ];
+            
+            elements.forEach(elementId => {
+                const element = document.getElementById(elementId);
+                if (element) {
+                    addResult(container, `✅ 元素 ${elementId} 存在`, 'success');
+                } else {
+                    addResult(container, `❌ 元素 ${elementId} 不存在`, 'error');
+                }
+            });
+        }
+
+        // 页面加载完成后自动运行基本测试
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                testElectronAPI();
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

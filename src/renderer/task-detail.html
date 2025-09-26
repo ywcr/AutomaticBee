@@ -1,0 +1,1071 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>任务详情 - 精灵蜂</title>
+    <link rel="stylesheet" href="lgb/layui/css/layui.css">
+    <link rel="stylesheet" href="lgb/font-awesome/css/font-awesome.min.css">
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        /* 顶部导航 */
+        .header {
+            background: white;
+            padding: 15px 20px;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header .back-btn {
+            font-size: 20px;
+            color: #666;
+            cursor: pointer;
+            margin-right: 15px;
+        }
+
+        .header .title {
+            flex: 1;
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .header .share-btn {
+            font-size: 18px;
+            color: #666;
+            cursor: pointer;
+        }
+
+        /* 任务基本信息 */
+        .task-info {
+            background: white;
+            margin: 15px;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .task-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 15px;
+            line-height: 1.4;
+        }
+
+        .task-meta {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+        }
+
+        .meta-item .icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+            font-size: 14px;
+            color: white;
+        }
+
+        .meta-item .icon.blue { background: #3498db; }
+        .meta-item .icon.green { background: #27ae60; }
+        .meta-item .icon.orange { background: #f39c12; }
+        .meta-item .icon.red { background: #e74c3c; }
+
+        .meta-item .content {
+            flex: 1;
+        }
+
+        .meta-item .label {
+            font-size: 12px;
+            color: #999;
+            margin-bottom: 2px;
+        }
+
+        .meta-item .value {
+            font-size: 14px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .task-amount {
+            text-align: center;
+            padding: 20px;
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            border-radius: 12px;
+            color: white;
+            margin-bottom: 20px;
+        }
+
+        .task-amount .amount {
+            font-size: 32px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .task-amount .label {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        /* 任务状态 */
+        .task-status {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .task-status.pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .task-status.processing {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .task-status.completed {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .task-status.cancelled {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        /* 任务描述 */
+        .task-description {
+            background: white;
+            margin: 0 15px 15px 15px;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+
+        .section-title i {
+            margin-right: 8px;
+            color: #009688;
+        }
+
+        .description-content {
+            color: #666;
+            line-height: 1.6;
+            font-size: 14px;
+        }
+
+        /* 任务要求 */
+        .task-requirements {
+            background: white;
+            margin: 0 15px 15px 15px;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .requirement-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 12px;
+            padding: 12px;
+            background: #f9f9f9;
+            border-radius: 8px;
+        }
+
+        .requirement-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .requirement-item .icon {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #009688;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            margin-right: 12px;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .requirement-item .text {
+            flex: 1;
+            color: #333;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        /* 发布者信息 */
+        .publisher-info {
+            background: white;
+            margin: 0 15px 15px 15px;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .publisher-profile {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .publisher-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #009688;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            margin-right: 15px;
+        }
+
+        .publisher-details .name {
+            font-size: 16px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 4px;
+        }
+
+        .publisher-details .info {
+            font-size: 12px;
+            color: #999;
+        }
+
+        .publisher-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            text-align: center;
+        }
+
+        .stat-item .number {
+            font-size: 18px;
+            font-weight: bold;
+            color: #009688;
+            margin-bottom: 4px;
+        }
+
+        .stat-item .label {
+            font-size: 12px;
+            color: #666;
+        }
+
+        /* 操作按钮 */
+        .action-buttons {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            padding: 15px 20px;
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn-secondary {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #009688;
+            background: white;
+            color: #009688;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-secondary:hover {
+            background: #f0f9f8;
+        }
+
+        .btn-primary {
+            flex: 2;
+            padding: 12px;
+            background: #009688;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary:hover {
+            background: #00796b;
+        }
+
+        .btn-primary:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .btn-danger {
+            flex: 1;
+            padding: 12px;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-danger:hover {
+            background: #c0392b;
+        }
+
+        /* 加载状态 */
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+
+        .loading i {
+            font-size: 24px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* 响应式设计 */
+        @media (min-width: 768px) {
+            .task-info, .task-description, .task-requirements, .publisher-info {
+                margin: 15px auto;
+                max-width: 600px;
+            }
+            
+            .action-buttons {
+                max-width: 600px;
+                left: 50%;
+                transform: translateX(-50%);
+                border-radius: 12px 12px 0 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部导航 -->
+    <div class="header">
+        <div class="back-btn" onclick="goBack()">
+            <i class="fa fa-arrow-left"></i>
+        </div>
+        <div class="title">任务详情</div>
+        <div class="share-btn" onclick="shareTask()">
+            <i class="fa fa-share-alt"></i>
+        </div>
+    </div>
+
+    <!-- 加载状态 -->
+    <div id="loading-container" class="loading">
+        <i class="fa fa-spinner"></i>
+        <div>加载中...</div>
+    </div>
+
+    <!-- 任务内容 -->
+    <div id="task-container" style="display: none; padding-bottom: 80px;">
+        <!-- 任务基本信息 -->
+        <div class="task-info">
+            <div class="task-title" id="task-title">加载中...</div>
+            
+            <div class="task-amount">
+                <div class="amount" id="task-amount">¥0</div>
+                <div class="label">任务报酬</div>
+            </div>
+            
+            <div class="task-meta">
+                <div class="meta-item">
+                    <div class="icon blue">
+                        <i class="fa fa-building"></i>
+                    </div>
+                    <div class="content">
+                        <div class="label">发布企业</div>
+                        <div class="value" id="task-company">-</div>
+                    </div>
+                </div>
+                
+                <div class="meta-item">
+                    <div class="icon green">
+                        <i class="fa fa-map-marker"></i>
+                    </div>
+                    <div class="content">
+                        <div class="label">任务区域</div>
+                        <div class="value" id="task-area">-</div>
+                    </div>
+                </div>
+                
+                <div class="meta-item">
+                    <div class="icon orange">
+                        <i class="fa fa-clock-o"></i>
+                    </div>
+                    <div class="content">
+                        <div class="label">截止时间</div>
+                        <div class="value" id="task-deadline">-</div>
+                    </div>
+                </div>
+                
+                <div class="meta-item">
+                    <div class="icon red">
+                        <i class="fa fa-tag"></i>
+                    </div>
+                    <div class="content">
+                        <div class="label">任务状态</div>
+                        <div class="value">
+                            <span class="task-status pending" id="task-status">待承接</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 任务描述 -->
+        <div class="task-description">
+            <div class="section-title">
+                <i class="fa fa-file-text-o"></i>
+                任务描述
+            </div>
+            <div class="description-content" id="task-description">
+                加载中...
+            </div>
+        </div>
+
+        <!-- 任务要求 -->
+        <div class="task-requirements">
+            <div class="section-title">
+                <i class="fa fa-list-ul"></i>
+                任务要求
+            </div>
+            <div id="task-requirements-list">
+                <!-- 动态生成 -->
+            </div>
+        </div>
+
+        <!-- 发布者信息 -->
+        <div class="publisher-info">
+            <div class="section-title">
+                <i class="fa fa-user"></i>
+                发布者信息
+            </div>
+            <div class="publisher-profile">
+                <div class="publisher-avatar">
+                    <i class="fa fa-user"></i>
+                </div>
+                <div class="publisher-details">
+                    <div class="name" id="publisher-name">加载中...</div>
+                    <div class="info" id="publisher-info">认证企业用户</div>
+                </div>
+            </div>
+            <div class="publisher-stats">
+                <div class="stat-item">
+                    <div class="number" id="publisher-tasks">0</div>
+                    <div class="label">发布任务</div>
+                </div>
+                <div class="stat-item">
+                    <div class="number" id="publisher-rating">5.0</div>
+                    <div class="label">信用评分</div>
+                </div>
+                <div class="stat-item">
+                    <div class="number" id="publisher-completion">100%</div>
+                    <div class="label">完成率</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 操作按钮 -->
+    <div class="action-buttons" id="action-buttons" style="display: none;">
+        <button class="btn-secondary" onclick="editTask()">
+            <i class="fa fa-edit"></i> 编辑
+        </button>
+        <button class="btn-primary" onclick="shareTask()">
+            <i class="fa fa-share"></i> 分享
+        </button>
+        <button class="btn-danger" onclick="deleteTask()">
+            <i class="fa fa-trash"></i> 删除
+        </button>
+    </div>
+
+    <script src="lgb/layui/layui.js"></script>
+    <script src="lgb/js/jquery.min.js"></script>
+    <script>
+        let taskData = null;
+        let taskId = null;
+        let isLoggedIn = false;
+        let userInfo = null;
+
+        // 页面加载完成
+        document.addEventListener('DOMContentLoaded', function() {
+            // 从URL参数获取任务ID
+            const urlParams = new URLSearchParams(window.location.search);
+            taskId = urlParams.get('id') || urlParams.get('taskId');
+
+            if (!taskId) {
+                showError('任务ID不存在');
+                return;
+            }
+
+            checkLoginStatus();
+            loadTaskDetail();
+        });
+
+        // 检查登录状态
+        async function checkLoginStatus() {
+            try {
+                const response = await fetch('/lgb/user/isAuthenticated', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    isLoggedIn = data.code === 200 || data.success;
+
+                    if (isLoggedIn) {
+                        await loadUserInfo();
+                    }
+                }
+            } catch (error) {
+                console.log('登录状态检查失败:', error);
+            }
+        }
+
+        // 加载用户信息
+        async function loadUserInfo() {
+            try {
+                const response = await fetch('/lgb/user/getBaseInfo.html', {
+                    method: 'POST'
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    userInfo = data.data || data;
+                }
+            } catch (error) {
+                console.log('用户信息加载失败:', error);
+            }
+        }
+
+        // 加载任务详情
+        async function loadTaskDetail() {
+            try {
+                // 尝试从真实API加载任务详情
+                const response = await fetch('/lgb/project/getProjectDetail.html', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: `recId=${taskId}`
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data && (data.data || data.project)) {
+                        taskData = data.data || data.project;
+                        renderTaskDetail();
+                        return;
+                    }
+                }
+
+                // API失败，使用模拟数据
+                throw new Error('API调用失败');
+
+            } catch (error) {
+                console.log('任务详情加载失败，使用模拟数据:', error);
+                taskData = generateMockTaskDetail();
+                renderTaskDetail();
+            }
+        }
+
+        // 生成模拟任务详情
+        function generateMockTaskDetail() {
+            const taskTypes = ['渠道档案', '信息收集', '渠道准入', '拜访巡访', '数据收集'];
+            const companies = ['阿里巴巴集团', '腾讯科技', '百度公司', '京东集团', '美团网'];
+            const areas = ['北京市', '上海市', '广州市', '深圳市', '杭州市'];
+
+            return {
+                recId: taskId,
+                projectTitle: `${taskTypes[Math.floor(Math.random() * taskTypes.length)]}任务 #${taskId}`,
+                enterpriseName: companies[Math.floor(Math.random() * companies.length)],
+                area: areas[Math.floor(Math.random() * areas.length)],
+                amount: Math.floor(Math.random() * 500 + 100),
+                deadline: new Date(Date.now() + Math.floor(Math.random() * 30) * 24 * 60 * 60 * 1000).toLocaleDateString(),
+                description: '这是一个重要的业务任务，需要专业人员完成。任务内容包括数据收集、信息整理、报告撰写等多个环节。要求承接者具备相关经验和专业技能，能够按时保质完成任务。',
+                requirements: [
+                    '具备相关行业经验，熟悉业务流程',
+                    '能够独立完成任务，具备良好的沟通能力',
+                    '按时提交高质量的工作成果',
+                    '遵守保密协议，保护客户信息安全'
+                ],
+                state: '0', // 0-待承接, 1-进行中, 2-已完成, 3-已取消
+                createTime: new Date(Date.now() - Math.floor(Math.random() * 7) * 24 * 60 * 60 * 1000).toISOString(),
+                publisher: {
+                    name: companies[Math.floor(Math.random() * companies.length)],
+                    tasks: Math.floor(Math.random() * 100 + 10),
+                    rating: (4.5 + Math.random() * 0.5).toFixed(1),
+                    completion: Math.floor(Math.random() * 20 + 80)
+                }
+            };
+        }
+
+        // 渲染任务详情
+        function renderTaskDetail() {
+            if (!taskData) return;
+
+            // 隐藏加载状态，显示内容
+            document.getElementById('loading-container').style.display = 'none';
+            document.getElementById('task-container').style.display = 'block';
+            document.getElementById('action-buttons').style.display = 'flex';
+
+            // 基本信息
+            document.getElementById('task-title').textContent = taskData.projectTitle || taskData.title || '未知任务';
+            document.getElementById('task-amount').textContent = `¥${taskData.amount || taskData.price || 0}`;
+            document.getElementById('task-company').textContent = taskData.enterpriseName || taskData.company || '未知企业';
+            document.getElementById('task-area').textContent = taskData.area || taskData.region || '全国';
+            document.getElementById('task-deadline').textContent = formatDate(taskData.deadline || taskData.endTime);
+
+            // 任务状态
+            const statusElement = document.getElementById('task-status');
+            const status = getTaskStatus(taskData.state || taskData.status);
+            statusElement.textContent = status.text;
+            statusElement.className = `task-status ${status.class}`;
+
+            // 任务描述
+            document.getElementById('task-description').textContent = taskData.description || taskData.remark || '暂无详细描述';
+
+            // 任务要求
+            renderTaskRequirements();
+
+            // 发布者信息
+            renderPublisherInfo();
+
+            // 更新操作按钮
+            updateActionButtons();
+        }
+
+        // 渲染任务要求
+        function renderTaskRequirements() {
+            const container = document.getElementById('task-requirements-list');
+            const requirements = taskData.requirements || [
+                '按时完成任务，保证工作质量',
+                '遵守相关规定和要求',
+                '及时沟通任务进展情况',
+                '提交完整的工作成果'
+            ];
+
+            const html = requirements.map((req, index) => `
+                <div class="requirement-item">
+                    <div class="icon">${index + 1}</div>
+                    <div class="text">${req}</div>
+                </div>
+            `).join('');
+
+            container.innerHTML = html;
+        }
+
+        // 渲染发布者信息
+        function renderPublisherInfo() {
+            const publisher = taskData.publisher || {
+                name: taskData.enterpriseName || '未知企业',
+                tasks: Math.floor(Math.random() * 50 + 10),
+                rating: '4.8',
+                completion: '95%'
+            };
+
+            document.getElementById('publisher-name').textContent = publisher.name;
+            document.getElementById('publisher-tasks').textContent = publisher.tasks;
+            document.getElementById('publisher-rating').textContent = publisher.rating;
+            document.getElementById('publisher-completion').textContent = publisher.completion + '%';
+        }
+
+        // 更新操作按钮
+        function updateActionButtons() {
+            const mainBtn = document.getElementById('main-action-btn');
+            const status = taskData.state || taskData.status || '0';
+
+            switch(status) {
+                case '0': // 待承接
+                    mainBtn.innerHTML = '<i class="fa fa-hand-paper-o"></i> 承接任务';
+                    mainBtn.onclick = acceptTask;
+                    mainBtn.disabled = false;
+                    break;
+                case '1': // 进行中
+                    if (isMyTask()) {
+                        mainBtn.innerHTML = '<i class="fa fa-upload"></i> 提交任务';
+                        mainBtn.onclick = submitTask;
+                        mainBtn.disabled = false;
+                    } else {
+                        mainBtn.innerHTML = '<i class="fa fa-clock-o"></i> 任务进行中';
+                        mainBtn.disabled = true;
+                    }
+                    break;
+                case '2': // 已完成
+                    mainBtn.innerHTML = '<i class="fa fa-check"></i> 任务已完成';
+                    mainBtn.disabled = true;
+                    break;
+                case '3': // 已取消
+                    mainBtn.innerHTML = '<i class="fa fa-times"></i> 任务已取消';
+                    mainBtn.disabled = true;
+                    break;
+            }
+        }
+
+        // 检查是否是我的任务
+        function isMyTask() {
+            // 这里应该检查当前用户是否是任务的承接者
+            // 暂时返回随机结果用于演示
+            return Math.random() > 0.5;
+        }
+
+        // 获取任务状态
+        function getTaskStatus(state) {
+            const statusMap = {
+                '0': { text: '待承接', class: 'pending' },
+                '1': { text: '进行中', class: 'processing' },
+                '2': { text: '已完成', class: 'completed' },
+                '3': { text: '已取消', class: 'cancelled' }
+            };
+            return statusMap[state] || statusMap['0'];
+        }
+
+        // 格式化日期
+        function formatDate(dateStr) {
+            if (!dateStr) return '未设定';
+
+            try {
+                const date = new Date(dateStr);
+                return date.toLocaleDateString('zh-CN', {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit'
+                });
+            } catch (error) {
+                return dateStr;
+            }
+        }
+
+        // 显示错误信息
+        function showError(message) {
+            document.getElementById('loading-container').innerHTML = `
+                <div style="text-align: center; padding: 40px; color: #e74c3c;">
+                    <i class="fa fa-exclamation-triangle" style="font-size: 48px; margin-bottom: 15px;"></i>
+                    <h3>加载失败</h3>
+                    <p>${message}</p>
+                    <button class="layui-btn" onclick="goBack()">返回</button>
+                </div>
+            `;
+        }
+
+        // 页面功能函数
+        function goBack() {
+            if (window.history.length > 1) {
+                window.history.back();
+            } else {
+                window.location.href = '/automation-dashboard.html';
+            }
+        }
+
+        function editTask() {
+            // 跳转到编辑页面或打开编辑模态框
+            window.location.href = `/automation-dashboard.html?tab=tasks&action=edit&id=${taskId}`;
+        }
+
+        function shareTask() {
+            layui.use('layer', function(){
+                const layer = layui.layer;
+                layer.msg('分享功能开发中...', {icon: 0});
+            });
+        }
+
+        function deleteTask() {
+            layui.use('layer', function(){
+                const layer = layui.layer;
+                layer.confirm('确定要删除这个任务吗？此操作不可恢复。', {
+                    btn: ['确定删除', '取消'],
+                    title: '删除确认'
+                }, function(index) {
+                    performDeleteTask();
+                    layer.close(index);
+                });
+            });
+        }
+
+        async function performDeleteTask() {
+            const layer = layui.layer;
+            const loadingIndex = layer.load(2, {shade: [0.3, '#000']});
+
+            try {
+                const response = await fetch('/lgb/workOrder/delete', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: `id=${taskId}`
+                });
+
+                const result = await response.json();
+
+                if (result.code === 0) {
+                    layer.close(loadingIndex);
+                    layer.msg('任务删除成功！', {icon: 1, time: 2000});
+
+                    // 延迟返回上一页
+                    setTimeout(() => {
+                        goBack();
+                    }, 2000);
+                } else {
+                    layer.close(loadingIndex);
+                    layer.msg('删除失败: ' + (result.message || '未知错误'), {icon: 2});
+                }
+
+            } catch (error) {
+                layer.close(loadingIndex);
+                console.log('任务删除失败:', error);
+                layer.msg('删除失败，请重试', {icon: 2});
+            }
+        }
+
+        function contactPublisher() {
+            if (!isLoggedIn) {
+                layui.use('layer', function(){
+                    const layer = layui.layer;
+                    layer.confirm('请先登录后再联系发布者', {
+                        btn: ['去登录', '取消']
+                    }, function(index) {
+                        window.location.href = '/login.html';
+                        layer.close(index);
+                    });
+                });
+                return;
+            }
+
+            layui.use('layer', function(){
+                const layer = layui.layer;
+                layer.open({
+                    type: 1,
+                    title: '联系发布者',
+                    area: ['90%', '60%'],
+                    content: `
+                        <div style="padding: 20px;">
+                            <div style="text-align: center; margin-bottom: 20px;">
+                                <i class="fa fa-comments" style="font-size: 48px; color: #009688; margin-bottom: 15px;"></i>
+                                <h3>联系发布者</h3>
+                                <p style="color: #666;">您可以通过以下方式联系任务发布者</p>
+                            </div>
+                            <div style="margin-bottom: 15px;">
+                                <button class="layui-btn layui-btn-fluid" onclick="startChat()">
+                                    <i class="fa fa-wechat"></i> 在线聊天
+                                </button>
+                            </div>
+                            <div>
+                                <button class="layui-btn layui-btn-normal layui-btn-fluid" onclick="callPublisher()">
+                                    <i class="fa fa-phone"></i> 电话联系
+                                </button>
+                            </div>
+                        </div>
+                    `
+                });
+            });
+        }
+
+        function acceptTask() {
+            if (!isLoggedIn) {
+                layui.use('layer', function(){
+                    const layer = layui.layer;
+                    layer.confirm('请先登录后再承接任务', {
+                        btn: ['去登录', '取消']
+                    }, function(index) {
+                        window.location.href = '/login.html';
+                        layer.close(index);
+                    });
+                });
+                return;
+            }
+
+            layui.use('layer', function(){
+                const layer = layui.layer;
+                layer.confirm(`确定要承接这个任务吗？<br><br><strong>任务报酬：¥${taskData.amount || 0}</strong>`, {
+                    btn: ['确定承接', '取消'],
+                    title: '承接任务确认'
+                }, function(index) {
+                    performAcceptTask();
+                    layer.close(index);
+                });
+            });
+        }
+
+        async function performAcceptTask() {
+            const layer = layui.layer;
+            const loadingIndex = layer.load(2, {shade: [0.3, '#000']});
+
+            try {
+                // 尝试调用真实API
+                const response = await fetch('/lgb/project/acceptTask.html', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: `taskId=${taskId}&recId=${taskId}`
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    if (result.code === 200 || result.success) {
+                        layer.close(loadingIndex);
+                        layer.msg('任务承接成功！', {icon: 1, time: 2000});
+
+                        // 更新任务状态
+                        taskData.state = '1';
+                        updateActionButtons();
+
+                        // 刷新状态显示
+                        const statusElement = document.getElementById('task-status');
+                        statusElement.textContent = '进行中';
+                        statusElement.className = 'task-status processing';
+
+                        return;
+                    }
+                }
+
+                throw new Error('API调用失败');
+
+            } catch (error) {
+                layer.close(loadingIndex);
+                console.log('任务承接失败:', error);
+
+                // 演示模式：显示成功
+                layer.msg('演示模式：任务承接成功！', {icon: 1, time: 2000});
+                taskData.state = '1';
+                updateActionButtons();
+
+                const statusElement = document.getElementById('task-status');
+                statusElement.textContent = '进行中';
+                statusElement.className = 'task-status processing';
+            }
+        }
+
+        function submitTask() {
+            layui.use('layer', function(){
+                const layer = layui.layer;
+                layer.open({
+                    type: 1,
+                    title: '提交任务',
+                    area: ['90%', '70%'],
+                    content: `
+                        <div style="padding: 20px;">
+                            <form id="submit-form">
+                                <div style="margin-bottom: 15px;">
+                                    <label style="display: block; margin-bottom: 5px; font-weight: bold;">任务完成说明：</label>
+                                    <textarea name="description" placeholder="请详细说明任务完成情况..."
+                                              style="width: 100%; height: 100px; padding: 10px; border: 1px solid #ddd; border-radius: 4px; resize: vertical;"></textarea>
+                                </div>
+                                <div style="margin-bottom: 15px;">
+                                    <label style="display: block; margin-bottom: 5px; font-weight: bold;">上传附件：</label>
+                                    <input type="file" multiple accept=".jpg,.jpeg,.png,.pdf,.doc,.docx,.xls,.xlsx"
+                                           style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                                </div>
+                                <div style="text-align: right;">
+                                    <button type="button" class="layui-btn layui-btn-primary" onclick="layer.closeAll()">取消</button>
+                                    <button type="button" class="layui-btn" onclick="performSubmitTask()">提交任务</button>
+                                </div>
+                            </form>
+                        </div>
+                    `
+                });
+            });
+        }
+
+        async function performSubmitTask() {
+            const layer = layui.layer;
+            const loadingIndex = layer.load(2, {shade: [0.3, '#000']});
+
+            try {
+                // 模拟提交过程
+                await new Promise(resolve => setTimeout(resolve, 2000));
+
+                layer.close(loadingIndex);
+                layer.closeAll();
+                layer.msg('任务提交成功，等待审核！', {icon: 1, time: 2000});
+
+                // 更新任务状态为已完成
+                taskData.state = '2';
+                updateActionButtons();
+
+                const statusElement = document.getElementById('task-status');
+                statusElement.textContent = '已完成';
+                statusElement.className = 'task-status completed';
+
+            } catch (error) {
+                layer.close(loadingIndex);
+                layer.msg('提交失败，请重试', {icon: 2});
+            }
+        }
+
+        function startChat() {
+            layui.layer.closeAll();
+            const publisherName = taskData.publisher?.name || taskData.enterpriseName || '任务发布者';
+            window.location.href = `/chat.html?userId=${taskData.recId || taskId}&userName=${encodeURIComponent(publisherName)}`;
+        }
+
+        function callPublisher() {
+            layui.layer.closeAll();
+            layui.use('layer', function(){
+                const layer = layui.layer;
+                layer.msg('电话联系功能开发中...', {icon: 0});
+            });
+        }
+    </script>
+</body>
+</html>

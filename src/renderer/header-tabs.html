@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>标签栏</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            font-size: 13px;
+            height: 40px;
+            background: linear-gradient(180deg, #f8f9fa 0%, #e9ecef 100%);
+            border-bottom: 1px solid #dee2e6;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            user-select: none;
+            -webkit-app-region: drag;
+        }
+
+        .header-tabs {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            height: 100%;
+            -webkit-app-region: no-drag;
+        }
+
+        .tabs-container {
+            display: flex;
+            align-items: center;
+            flex: 1;
+            height: 100%;
+            overflow-x: auto;
+            overflow-y: hidden;
+        }
+
+        .tab-item {
+            display: flex;
+            align-items: center;
+            min-width: 120px;
+            max-width: 240px;
+            height: 32px;
+            margin: 4px 2px;
+            padding: 0 12px;
+            background: #ffffff;
+            border: 1px solid #d0d7de;
+            border-radius: 6px;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.15s ease;
+            white-space: nowrap;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .tab-item:hover {
+            background: #f6f8fa;
+            border-color: #8c959f;
+        }
+
+        .tab-item.active {
+            background: #0969da;
+            border-color: #0969da;
+            color: #ffffff;
+            box-shadow: 0 1px 3px rgba(9, 105, 218, 0.12);
+        }
+
+        .tab-item.active:hover {
+            background: #0860ca;
+            border-color: #0860ca;
+        }
+
+        .tab-icon {
+            margin-right: 6px;
+            font-size: 12px;
+            opacity: 0.8;
+            flex-shrink: 0;
+        }
+
+        .tab-title {
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            font-size: 12px;
+            line-height: 1.2;
+        }
+
+        .tab-title.editing {
+            background: transparent;
+            border: none;
+            outline: none;
+            color: inherit;
+            font: inherit;
+            width: 100%;
+        }
+
+        .tab-close {
+            margin-left: 6px;
+            width: 16px;
+            height: 16px;
+            border: none;
+            background: none;
+            cursor: pointer;
+            border-radius: 3px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            opacity: 0.6;
+            flex-shrink: 0;
+        }
+
+        .tab-close:hover {
+            opacity: 1;
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        .tab-item.active .tab-close:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .new-tab-btn {
+            margin-left: 8px;
+            width: 32px;
+            height: 32px;
+            border: 1px solid #d0d7de;
+            background: #ffffff;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            color: #656d76;
+            transition: all 0.15s ease;
+            flex-shrink: 0;
+        }
+
+        .new-tab-btn:hover {
+            background: #f6f8fa;
+            border-color: #8c959f;
+            color: #24292f;
+        }
+
+        .new-tab-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* 上下文菜单样式 */
+        .context-menu {
+            position: fixed;
+            background: #ffffff;
+            border: 1px solid #d0d7de;
+            border-radius: 6px;
+            box-shadow: 0 8px 24px rgba(140, 149, 159, 0.2);
+            z-index: 1000;
+            min-width: 160px;
+            display: none;
+        }
+
+        .context-menu-item {
+            padding: 8px 12px;
+            cursor: pointer;
+            font-size: 13px;
+            border-bottom: 1px solid #f6f8fa;
+            display: flex;
+            align-items: center;
+        }
+
+        .context-menu-item:last-child {
+            border-bottom: none;
+        }
+
+        .context-menu-item:hover {
+            background: #f6f8fa;
+        }
+
+        .context-menu-item.disabled {
+            color: #8c959f;
+            cursor: not-allowed;
+        }
+
+        .context-menu-item.disabled:hover {
+            background: transparent;
+        }
+
+        .context-menu-item .icon {
+            margin-right: 8px;
+            width: 14px;
+            text-align: center;
+        }
+
+        /* 滚动条样式 */
+        .tabs-container::-webkit-scrollbar {
+            height: 4px;
+        }
+
+        .tabs-container::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .tabs-container::-webkit-scrollbar-thumb {
+            background: #d0d7de;
+            border-radius: 2px;
+        }
+
+        .tabs-container::-webkit-scrollbar-thumb:hover {
+            background: #8c959f;
+        }
+
+        /* 加载状态 */
+        .loading {
+            color: #8c959f;
+            font-size: 12px;
+            padding: 0 12px;
+        }
+
+        /* 错误状态 */
+        .error {
+            color: #d1242f;
+            font-size: 12px;
+            padding: 0 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header-tabs" id="header-tabs">
+        <div class="tabs-container" id="tabs-container">
+            <div class="loading">正在加载标签...</div>
+        </div>
+        <button class="new-tab-btn" id="new-tab-btn" title="新建标签">
+            <i class="fas fa-plus"></i>
+        </button>
+    </div>
+
+    <!-- 上下文菜单 -->
+    <div class="context-menu" id="context-menu">
+        <div class="context-menu-item" data-action="rename">
+            <i class="fas fa-edit icon"></i>
+            重命名标签
+        </div>
+        <div class="context-menu-item" data-action="duplicate">
+            <i class="fas fa-copy icon"></i>
+            复制标签
+        </div>
+        <div class="context-menu-item" data-action="close-others">
+            <i class="fas fa-times-circle icon"></i>
+            关闭其他标签
+        </div>
+        <div class="context-menu-item" data-action="close">
+            <i class="fas fa-times icon"></i>
+            关闭标签
+        </div>
+    </div>
+
+    <script src="scripts/header-tabs.js"></script>
+</body>
+</html>

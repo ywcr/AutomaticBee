@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>渠道详情 - 精灵蜂</title>
+    <link rel="stylesheet" href="lgb/layui/css/layui.css">
+    <link rel="stylesheet" href="lgb/font-awesome/css/font-awesome.min.css">
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        /* 顶部导航 */
+        .header {
+            background: white;
+            padding: 15px 20px;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header .back-btn {
+            font-size: 20px;
+            color: #666;
+            cursor: pointer;
+            margin-right: 15px;
+        }
+
+        .header .title {
+            flex: 1;
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .header .edit-btn {
+            font-size: 18px;
+            color: #009688;
+            cursor: pointer;
+        }
+
+        /* 渠道基本信息 */
+        .channel-info {
+            background: white;
+            margin: 15px;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .channel-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .channel-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #2196F3, #1976D2);
+            color: white;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .channel-name {
+            font-size: 20px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+            line-height: 1.4;
+        }
+
+        .channel-type {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+
+        .channel-status {
+            margin-top: 10px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .status-badge.complete {
+            background: #e8f5e8;
+            color: #2e7d32;
+        }
+
+        .status-badge.incomplete {
+            background: #fff3e0;
+            color: #f57c00;
+        }
+
+        .channel-meta {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+        }
+
+        .meta-item .icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+            font-size: 14px;
+            color: white;
+        }
+
+        .meta-item .icon.blue { background: #3498db; }
+        .meta-item .icon.green { background: #27ae60; }
+        .meta-item .icon.orange { background: #f39c12; }
+        .meta-item .icon.purple { background: #9b59b6; }
+
+        .meta-item .content {
+            flex: 1;
+        }
+
+        .meta-item .label {
+            font-size: 12px;
+            color: #999;
+            margin-bottom: 2px;
+        }
+
+        .meta-item .value {
+            font-size: 14px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        /* 详细信息 */
+        .channel-details {
+            background: white;
+            margin: 0 15px 15px 15px;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+
+        .section-title i {
+            margin-right: 8px;
+            color: #2196F3;
+        }
+
+        .detail-row {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 12px;
+            padding: 12px;
+            background: #f9f9f9;
+            border-radius: 8px;
+        }
+
+        .detail-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .detail-row .label {
+            min-width: 80px;
+            font-weight: 500;
+            color: #666;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+
+        .detail-row .value {
+            flex: 1;
+            color: #333;
+            word-break: break-all;
+        }
+
+        /* 地图信息 */
+        .location-info {
+            background: white;
+            margin: 0 15px 15px 15px;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .coordinates {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .coordinate-item {
+            text-align: center;
+            padding: 15px;
+            background: #f5f5f5;
+            border-radius: 8px;
+        }
+
+        .coordinate-item .label {
+            font-size: 12px;
+            color: #999;
+            margin-bottom: 5px;
+        }
+
+        .coordinate-item .value {
+            font-size: 18px;
+            font-weight: bold;
+            color: #2196F3;
+        }
+
+        /* 操作按钮 */
+        .action-buttons {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            padding: 15px 20px;
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn-secondary {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #2196F3;
+            background: white;
+            color: #2196F3;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-secondary:hover {
+            background: #e3f2fd;
+        }
+
+        .btn-primary {
+            flex: 1;
+            padding: 12px;
+            background: #2196F3;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary:hover {
+            background: #1976D2;
+        }
+
+        .btn-danger {
+            flex: 1;
+            padding: 12px;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-danger:hover {
+            background: #c0392b;
+        }
+
+        /* 加载状态 */
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+
+        .loading i {
+            font-size: 24px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* 响应式设计 */
+        @media (min-width: 768px) {
+            .channel-info, .channel-details, .location-info {
+                margin: 15px auto;
+                max-width: 600px;
+            }
+            
+            .action-buttons {
+                max-width: 600px;
+                left: 50%;
+                transform: translateX(-50%);
+                border-radius: 12px 12px 0 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部导航 -->
+    <div class="header">
+        <div class="back-btn" onclick="goBack()">
+            <i class="fa fa-arrow-left"></i>
+        </div>
+        <div class="title">渠道详情</div>
+        <div class="edit-btn" onclick="editChannel()">
+            <i class="fa fa-edit"></i>
+        </div>
+    </div>
+
+    <!-- 加载状态 -->
+    <div id="loading-container" class="loading">
+        <i class="fa fa-spinner"></i>
+        <div>加载中...</div>
+    </div>
+
+    <!-- 渠道内容 -->
+    <div id="channel-container" style="display: none; padding-bottom: 80px;">
+        <!-- 渠道基本信息 -->
+        <div class="channel-info">
+            <div class="channel-header">
+                <div class="channel-icon" id="channel-icon">
+                    <i class="fa fa-building"></i>
+                </div>
+                <div class="channel-name" id="channel-name">加载中...</div>
+                <div class="channel-type" id="channel-type">-</div>
+                <div class="channel-status">
+                    <span class="status-badge complete" id="channel-status">完整</span>
+                </div>
+            </div>
+            
+            <div class="channel-meta">
+                <div class="meta-item">
+                    <div class="icon blue">
+                        <i class="fa fa-map-marker"></i>
+                    </div>
+                    <div class="content">
+                        <div class="label">区域代码</div>
+                        <div class="value" id="channel-adcode">-</div>
+                    </div>
+                </div>
+                
+                <div class="meta-item">
+                    <div class="icon green">
+                        <i class="fa fa-globe"></i>
+                    </div>
+                    <div class="content">
+                        <div class="label">所属区域</div>
+                        <div class="value" id="channel-areas">-</div>
+                    </div>
+                </div>
+                
+                <div class="meta-item">
+                    <div class="icon orange">
+                        <i class="fa fa-user"></i>
+                    </div>
+                    <div class="content">
+                        <div class="label">创建人</div>
+                        <div class="value" id="channel-creator">-</div>
+                    </div>
+                </div>
+                
+                <div class="meta-item">
+                    <div class="icon purple">
+                        <i class="fa fa-clock-o"></i>
+                    </div>
+                    <div class="content">
+                        <div class="label">创建时间</div>
+                        <div class="value" id="channel-create-time">-</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 详细信息 -->
+        <div class="channel-details">
+            <div class="section-title">
+                <i class="fa fa-info-circle"></i>
+                详细信息
+            </div>
+            <div id="channel-details-list">
+                <!-- 动态生成 -->
+            </div>
+        </div>
+
+        <!-- 位置信息 -->
+        <div class="location-info">
+            <div class="section-title">
+                <i class="fa fa-map"></i>
+                位置信息
+            </div>
+            <div class="coordinates">
+                <div class="coordinate-item">
+                    <div class="label">经度</div>
+                    <div class="value" id="channel-lng">-</div>
+                </div>
+                <div class="coordinate-item">
+                    <div class="label">纬度</div>
+                    <div class="value" id="channel-lat">-</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 操作按钮 -->
+    <div class="action-buttons" id="action-buttons" style="display: none;">
+        <button class="btn-secondary" onclick="editChannel()">
+            <i class="fa fa-edit"></i> 编辑
+        </button>
+        <button class="btn-primary" onclick="viewOnMap()">
+            <i class="fa fa-map"></i> 地图查看
+        </button>
+        <button class="btn-danger" onclick="deleteChannel()">
+            <i class="fa fa-trash"></i> 删除
+        </button>
+    </div>
+
+    <script src="lgb/layui/layui.js"></script>
+    <script src="lgb/js/jquery.min.js"></script>
+    <script>
+        let channelData = null;
+        let channelId = null;
+
+        // 页面加载完成
+        document.addEventListener('DOMContentLoaded', function() {
+            // 从URL参数获取渠道ID
+            const urlParams = new URLSearchParams(window.location.search);
+            channelId = urlParams.get('id') || urlParams.get('channelId');
+
+            if (!channelId) {
+                showError('渠道ID不存在');
+                return;
+            }
+
+            loadChannelDetail();
+        });
+
+        // 加载渠道详情
+        async function loadChannelDetail() {
+            try {
+                // 尝试从真实API加载渠道详情
+                const response = await fetch('/lgb/qdkh/getDetail', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: `id=${channelId}`
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data && data.code === 0 && data.data) {
+                        channelData = data.data;
+                        renderChannelDetail();
+                        return;
+                    }
+                }
+
+                // API失败，使用模拟数据
+                throw new Error('API调用失败');
+
+            } catch (error) {
+                console.log('渠道详情加载失败，使用模拟数据:', error);
+                channelData = generateMockChannelDetail();
+                renderChannelDetail();
+            }
+        }
+
+        // 生成模拟渠道详情
+        function generateMockChannelDetail() {
+            const channelTypes = ['零售渠道档案', '等级医院档案', '基层医疗档案', '竞品渠道档案'];
+            const areas = ['北京市朝阳区', '上海市浦东新区', '广州市天河区', '深圳市南山区'];
+            const names = ['北京某某医院', '上海某某药店', '广州某某诊所', '深圳某某医疗中心'];
+
+            return {
+                id: channelId,
+                channelName: names[Math.floor(Math.random() * names.length)],
+                channelType: channelTypes[Math.floor(Math.random() * channelTypes.length)],
+                address: '某某街道某某号某某楼某某室',
+                adcode: '110105',
+                fullAreas: areas[Math.floor(Math.random() * areas.length)],
+                whetherComplete: Math.random() > 0.3 ? '1' : '0',
+                lng: (116.3 + Math.random() * 0.4).toFixed(6),
+                lat: (39.9 + Math.random() * 0.2).toFixed(6),
+                empId: '1645705104307',
+                createtime: new Date(Date.now() - Math.floor(Math.random() * 30) * 24 * 60 * 60 * 1000).toISOString()
+            };
+        }
+
+        // 渲染渠道详情
+        function renderChannelDetail() {
+            if (!channelData) return;
+
+            // 隐藏加载状态，显示内容
+            document.getElementById('loading-container').style.display = 'none';
+            document.getElementById('channel-container').style.display = 'block';
+            document.getElementById('action-buttons').style.display = 'flex';
+
+            // 基本信息
+            document.getElementById('channel-name').textContent = channelData.channelName || '未知渠道';
+            document.getElementById('channel-type').textContent = channelData.channelType || '未知类型';
+            document.getElementById('channel-adcode').textContent = channelData.adcode || '未填写';
+            document.getElementById('channel-areas').textContent = channelData.fullAreas || '未填写';
+            document.getElementById('channel-creator').textContent = channelData.empId || '未知';
+            document.getElementById('channel-create-time').textContent = formatDate(channelData.createtime);
+
+            // 状态
+            const statusElement = document.getElementById('channel-status');
+            const isComplete = channelData.whetherComplete === '1';
+            statusElement.textContent = isComplete ? '完整' : '不完整';
+            statusElement.className = `status-badge ${isComplete ? 'complete' : 'incomplete'}`;
+
+            // 坐标信息
+            document.getElementById('channel-lng').textContent = channelData.lng || '未设置';
+            document.getElementById('channel-lat').textContent = channelData.lat || '未设置';
+
+            // 渲染详细信息
+            renderChannelDetails();
+        }
+
+        // 渲染详细信息
+        function renderChannelDetails() {
+            const container = document.getElementById('channel-details-list');
+            const details = [
+                { label: '详细地址', value: channelData.address || '未填写' },
+                { label: '检查地址', value: channelData.checkaddress || '未填写' },
+                { label: '检查时间', value: formatDate(channelData.checktime) || '未检查' },
+                { label: '是否检查', value: channelData.ischeck === '1' ? '已检查' : '未检查' },
+                { label: '更新时间', value: formatDate(channelData.updattime) || '未更新' }
+            ];
+
+            const html = details.map(detail => `
+                <div class="detail-row">
+                    <div class="label">${detail.label}：</div>
+                    <div class="value">${detail.value}</div>
+                </div>
+            `).join('');
+
+            container.innerHTML = html;
+        }
+
+        // 格式化日期
+        function formatDate(dateStr) {
+            if (!dateStr) return '未知';
+
+            try {
+                const date = new Date(dateStr);
+                return date.toLocaleDateString('zh-CN', {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+            } catch (error) {
+                return dateStr;
+            }
+        }
+
+        // 显示错误信息
+        function showError(message) {
+            document.getElementById('loading-container').innerHTML = `
+                <div style="text-align: center; padding: 40px; color: #e74c3c;">
+                    <i class="fa fa-exclamation-triangle" style="font-size: 48px; margin-bottom: 15px;"></i>
+                    <h3>加载失败</h3>
+                    <p>${message}</p>
+                    <button class="layui-btn" onclick="goBack()">返回</button>
+                </div>
+            `;
+        }
+
+        // 页面功能函数
+        function goBack() {
+            if (window.history.length > 1) {
+                window.history.back();
+            } else {
+                window.location.href = '/automation-dashboard.html';
+            }
+        }
+
+        function editChannel() {
+            // 跳转到编辑页面或打开编辑模态框
+            window.location.href = `/automation-dashboard.html?tab=channels&action=edit&id=${channelId}`;
+        }
+
+        function viewOnMap() {
+            const lng = channelData.lng;
+            const lat = channelData.lat;
+            
+            if (!lng || !lat) {
+                layui.use('layer', function(){
+                    const layer = layui.layer;
+                    layer.msg('该渠道暂无坐标信息', {icon: 0});
+                });
+                return;
+            }
+
+            layui.use('layer', function(){
+                const layer = layui.layer;
+                layer.msg('地图查看功能开发中...', {icon: 0});
+            });
+        }
+
+        function deleteChannel() {
+            layui.use('layer', function(){
+                const layer = layui.layer;
+                layer.confirm('确定要删除这个渠道吗？此操作不可恢复。', {
+                    btn: ['确定删除', '取消'],
+                    title: '删除确认'
+                }, function(index) {
+                    performDeleteChannel();
+                    layer.close(index);
+                });
+            });
+        }
+
+        async function performDeleteChannel() {
+            const layer = layui.layer;
+            const loadingIndex = layer.load(2, {shade: [0.3, '#000']});
+
+            try {
+                const response = await fetch('/lgb/qdkh/delete', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: `id=${channelId}`
+                });
+
+                const result = await response.json();
+
+                if (result.code === 0) {
+                    layer.close(loadingIndex);
+                    layer.msg('渠道删除成功！', {icon: 1, time: 2000});
+                    
+                    // 延迟返回上一页
+                    setTimeout(() => {
+                        goBack();
+                    }, 2000);
+                } else {
+                    layer.close(loadingIndex);
+                    layer.msg('删除失败: ' + (result.message || '未知错误'), {icon: 2});
+                }
+
+            } catch (error) {
+                layer.close(loadingIndex);
+                console.log('渠道删除失败:', error);
+                layer.msg('删除失败，请重试', {icon: 2});
+            }
+        }
+    </script>
+</body>
+</html>

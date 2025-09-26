@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>聊天 - 精灵蜂</title>
+    <link rel="stylesheet" href="lgb/layui/css/layui.css">
+    <link rel="stylesheet" href="lgb/font-awesome/css/font-awesome.min.css">
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* 顶部导航 */
+        .header {
+            background: white;
+            padding: 15px 20px;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header .back-btn {
+            font-size: 20px;
+            color: #666;
+            cursor: pointer;
+            margin-right: 15px;
+        }
+
+        .header .user-info {
+            flex: 1;
+            display: flex;
+            align-items: center;
+        }
+
+        .header .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #009688;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            font-size: 16px;
+        }
+
+        .header .details .name {
+            font-size: 16px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 2px;
+        }
+
+        .header .details .status {
+            font-size: 12px;
+            color: #999;
+        }
+
+        .header .actions {
+            display: flex;
+            gap: 15px;
+        }
+
+        .header .actions i {
+            font-size: 18px;
+            color: #666;
+            cursor: pointer;
+        }
+
+        /* 聊天消息区域 */
+        .chat-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .message {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: flex-end;
+        }
+
+        .message.sent {
+            flex-direction: row-reverse;
+        }
+
+        .message .avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #009688;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            margin: 0 10px;
+            flex-shrink: 0;
+        }
+
+        .message.sent .avatar {
+            background: #3498db;
+        }
+
+        .message .content {
+            max-width: 70%;
+            position: relative;
+        }
+
+        .message .bubble {
+            background: white;
+            padding: 12px 16px;
+            border-radius: 18px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            word-wrap: break-word;
+            line-height: 1.4;
+        }
+
+        .message.sent .bubble {
+            background: #009688;
+            color: white;
+        }
+
+        .message .time {
+            font-size: 11px;
+            color: #999;
+            margin-top: 4px;
+            text-align: center;
+        }
+
+        .message.sent .time {
+            text-align: right;
+        }
+
+        /* 系统消息 */
+        .system-message {
+            text-align: center;
+            margin: 20px 0;
+            color: #999;
+            font-size: 12px;
+        }
+
+        /* 输入区域 */
+        .input-area {
+            background: white;
+            border-top: 1px solid #e0e0e0;
+            padding: 15px;
+            display: flex;
+            align-items: flex-end;
+            gap: 10px;
+        }
+
+        .input-area .input-container {
+            flex: 1;
+            position: relative;
+        }
+
+        .input-area textarea {
+            width: 100%;
+            min-height: 40px;
+            max-height: 120px;
+            padding: 10px 40px 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            resize: none;
+            font-size: 14px;
+            line-height: 1.4;
+            outline: none;
+        }
+
+        .input-area textarea:focus {
+            border-color: #009688;
+        }
+
+        .input-area .emoji-btn {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            font-size: 18px;
+            color: #666;
+            cursor: pointer;
+        }
+
+        .input-area .send-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #009688;
+            color: white;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .input-area .send-btn:hover {
+            background: #00796b;
+        }
+
+        .input-area .send-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        /* 快捷回复 */
+        .quick-replies {
+            background: white;
+            border-top: 1px solid #e0e0e0;
+            padding: 10px 15px;
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+        }
+
+        .quick-reply {
+            background: #f0f0f0;
+            color: #666;
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .quick-reply:hover {
+            background: #009688;
+            color: white;
+        }
+
+        /* 加载状态 */
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #999;
+        }
+
+        .loading i {
+            font-size: 18px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* 响应式设计 */
+        @media (min-width: 768px) {
+            body {
+                max-width: 600px;
+                margin: 0 auto;
+                border-left: 1px solid #e0e0e0;
+                border-right: 1px solid #e0e0e0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部导航 -->
+    <div class="header">
+        <div class="back-btn" onclick="goBack()">
+            <i class="fa fa-arrow-left"></i>
+        </div>
+        <div class="user-info">
+            <div class="avatar">
+                <i class="fa fa-user"></i>
+            </div>
+            <div class="details">
+                <div class="name" id="chat-user-name">客服小助手</div>
+                <div class="status" id="chat-user-status">在线</div>
+            </div>
+        </div>
+        <div class="actions">
+            <i class="fa fa-phone" onclick="makeCall()"></i>
+            <i class="fa fa-ellipsis-v" onclick="showMenu()"></i>
+        </div>
+    </div>
+
+    <!-- 聊天消息区域 -->
+    <div class="chat-container" id="chat-container">
+        <div class="system-message">
+            今天 14:30
+        </div>
+        
+        <div class="message">
+            <div class="avatar">
+                <i class="fa fa-user"></i>
+            </div>
+            <div class="content">
+                <div class="bubble">
+                    您好！欢迎使用精灵蜂任务管理平台，我是您的专属客服小助手。有什么可以帮助您的吗？
+                </div>
+                <div class="time">14:30</div>
+            </div>
+        </div>
+
+        <div class="message sent">
+            <div class="avatar">
+                <i class="fa fa-user"></i>
+            </div>
+            <div class="content">
+                <div class="bubble">
+                    你好，我想了解一下任务承接的流程
+                </div>
+                <div class="time">14:32</div>
+            </div>
+        </div>
+
+        <div class="message">
+            <div class="avatar">
+                <i class="fa fa-user"></i>
+            </div>
+            <div class="content">
+                <div class="bubble">
+                    好的，任务承接流程很简单：<br>
+                    1. 浏览任务市场，选择合适的任务<br>
+                    2. 查看任务详情，确认要求和报酬<br>
+                    3. 点击"承接任务"按钮<br>
+                    4. 按要求完成任务并提交成果<br>
+                    5. 等待审核通过后获得报酬
+                </div>
+                <div class="time">14:33</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 快捷回复 -->
+    <div class="quick-replies">
+        <div class="quick-reply" onclick="sendQuickReply('谢谢')">谢谢</div>
+        <div class="quick-reply" onclick="sendQuickReply('好的')">好的</div>
+        <div class="quick-reply" onclick="sendQuickReply('我明白了')">我明白了</div>
+        <div class="quick-reply" onclick="sendQuickReply('还有其他问题吗？')">还有其他问题吗？</div>
+        <div class="quick-reply" onclick="sendQuickReply('联系人工客服')">联系人工客服</div>
+    </div>
+
+    <!-- 输入区域 -->
+    <div class="input-area">
+        <div class="input-container">
+            <textarea id="message-input" placeholder="输入消息..." rows="1"></textarea>
+            <button class="emoji-btn" onclick="showEmoji()">
+                <i class="fa fa-smile-o"></i>
+            </button>
+        </div>
+        <button class="send-btn" id="send-btn" onclick="sendMessage()">
+            <i class="fa fa-paper-plane"></i>
+        </button>
+    </div>
+
+    <script src="lgb/layui/layui.js"></script>
+    <script src="lgb/js/jquery.min.js"></script>
+    <script>
+        let chatData = [];
+        let isLoggedIn = false;
+        let currentChatUser = null;
+
+        // 页面加载完成
+        document.addEventListener('DOMContentLoaded', function() {
+            // 从URL参数获取聊天对象信息
+            const urlParams = new URLSearchParams(window.location.search);
+            const userId = urlParams.get('userId');
+            const userName = urlParams.get('userName') || '客服小助手';
+
+            currentChatUser = { id: userId, name: userName };
+            document.getElementById('chat-user-name').textContent = userName;
+
+            checkLoginStatus();
+            initializeChat();
+            setupInputHandlers();
+        });
+
+        // 检查登录状态
+        async function checkLoginStatus() {
+            try {
+                const response = await fetch('/lgb/user/isAuthenticated', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    isLoggedIn = data.code === 200 || data.success;
+                }
+            } catch (error) {
+                console.log('登录状态检查失败:', error);
+            }
+        }
+
+        // 初始化聊天
+        function initializeChat() {
+            // 自动滚动到底部
+            scrollToBottom();
+
+            // 模拟在线状态
+            updateOnlineStatus();
+
+            // 如果是客服聊天，显示欢迎消息
+            if (!currentChatUser.id || currentChatUser.name.includes('客服')) {
+                setTimeout(() => {
+                    addSystemMessage('客服已为您接入，请问有什么可以帮助您的？');
+                }, 1000);
+            }
+        }
+
+        // 设置输入处理器
+        function setupInputHandlers() {
+            const input = document.getElementById('message-input');
+            const sendBtn = document.getElementById('send-btn');
+
+            // 自动调整输入框高度
+            input.addEventListener('input', function() {
+                this.style.height = 'auto';
+                this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+
+                // 更新发送按钮状态
+                sendBtn.disabled = !this.value.trim();
+            });
+
+            // 回车发送消息
+            input.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendMessage();
+                }
+            });
+
+            // 初始状态
+            sendBtn.disabled = true;
+        }
+
+        // 发送消息
+        function sendMessage() {
+            const input = document.getElementById('message-input');
+            const message = input.value.trim();
+
+            if (!message) return;
+
+            if (!isLoggedIn) {
+                layui.use('layer', function(){
+                    const layer = layui.layer;
+                    layer.confirm('请先登录后再发送消息', {
+                        btn: ['去登录', '取消']
+                    }, function(index) {
+                        window.location.href = '/login.html';
+                        layer.close(index);
+                    });
+                });
+                return;
+            }
+
+            // 添加发送的消息
+            addMessage(message, true);
+
+            // 清空输入框
+            input.value = '';
+            input.style.height = 'auto';
+            document.getElementById('send-btn').disabled = true;
+
+            // 模拟对方回复
+            setTimeout(() => {
+                simulateReply(message);
+            }, 1000 + Math.random() * 2000);
+        }
+
+        // 发送快捷回复
+        function sendQuickReply(message) {
+            if (!isLoggedIn) {
+                layui.use('layer', function(){
+                    const layer = layui.layer;
+                    layer.msg('请先登录', {icon: 0});
+                });
+                return;
+            }
+
+            addMessage(message, true);
+
+            // 模拟对方回复
+            setTimeout(() => {
+                simulateReply(message);
+            }, 1000 + Math.random() * 2000);
+        }
+
+        // 添加消息
+        function addMessage(content, isSent = false, time = null) {
+            const container = document.getElementById('chat-container');
+            const messageTime = time || getCurrentTime();
+
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${isSent ? 'sent' : ''}`;
+
+            messageDiv.innerHTML = `
+                <div class="avatar">
+                    <i class="fa fa-user"></i>
+                </div>
+                <div class="content">
+                    <div class="bubble">${content}</div>
+                    <div class="time">${messageTime}</div>
+                </div>
+            `;
+
+            container.appendChild(messageDiv);
+            scrollToBottom();
+
+            // 保存到聊天记录
+            chatData.push({
+                content: content,
+                isSent: isSent,
+                time: messageTime,
+                timestamp: Date.now()
+            });
+        }
+
+        // 添加系统消息
+        function addSystemMessage(content) {
+            const container = document.getElementById('chat-container');
+
+            const systemDiv = document.createElement('div');
+            systemDiv.className = 'system-message';
+            systemDiv.textContent = content;
+
+            container.appendChild(systemDiv);
+            scrollToBottom();
+        }
+
+        // 模拟回复
+        function simulateReply(userMessage) {
+            const replies = getAutoReplies(userMessage);
+            const reply = replies[Math.floor(Math.random() * replies.length)];
+
+            // 显示正在输入状态
+            showTypingIndicator();
+
+            setTimeout(() => {
+                hideTypingIndicator();
+                addMessage(reply, false);
+            }, 1500 + Math.random() * 1000);
+        }
+
+        // 获取自动回复
+        function getAutoReplies(userMessage) {
+            const message = userMessage.toLowerCase();
+
+            if (message.includes('任务') || message.includes('承接')) {
+                return [
+                    '关于任务承接，您可以在任务市场中浏览所有可用任务，选择合适的任务点击承接即可。',
+                    '任务承接后请按照要求完成，并在截止时间前提交成果。',
+                    '如果您对某个任务有疑问，可以联系任务发布者进行沟通。'
+                ];
+            } else if (message.includes('收入') || message.includes('钱') || message.includes('报酬')) {
+                return [
+                    '任务完成并通过审核后，报酬会自动结算到您的账户。',
+                    '您可以在个人中心查看收入明细和提现记录。',
+                    '一般情况下，任务报酬会在审核通过后24小时内到账。'
+                ];
+            } else if (message.includes('认证') || message.includes('身份')) {
+                return [
+                    '完成身份认证可以提高任务承接成功率，建议您尽快完善认证信息。',
+                    '身份认证包括手机号验证、身份证认证和银行卡绑定。',
+                    '认证过程中如有问题，请联系客服协助处理。'
+                ];
+            } else if (message.includes('谢谢') || message.includes('好的')) {
+                return [
+                    '不客气，很高兴能帮助到您！',
+                    '如果还有其他问题，随时可以联系我。',
+                    '祝您使用愉快！'
+                ];
+            } else if (message.includes('人工') || message.includes('客服')) {
+                return [
+                    '正在为您转接人工客服，请稍候...',
+                    '人工客服工作时间：9:00-18:00，如需紧急帮助请拨打客服热线。'
+                ];
+            } else {
+                return [
+                    '感谢您的咨询，我会尽力为您解答。',
+                    '如果我的回答没有解决您的问题，可以联系人工客服获得更详细的帮助。',
+                    '您还有其他问题需要咨询吗？',
+                    '我理解您的问题，让我为您详细说明一下。'
+                ];
+            }
+        }
+
+        // 显示正在输入指示器
+        function showTypingIndicator() {
+            const container = document.getElementById('chat-container');
+
+            const typingDiv = document.createElement('div');
+            typingDiv.id = 'typing-indicator';
+            typingDiv.className = 'message';
+            typingDiv.innerHTML = `
+                <div class="avatar">
+                    <i class="fa fa-user"></i>
+                </div>
+                <div class="content">
+                    <div class="bubble">
+                        <div class="loading">
+                            <i class="fa fa-spinner"></i>
+                            正在输入...
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            container.appendChild(typingDiv);
+            scrollToBottom();
+        }
+
+        // 隐藏正在输入指示器
+        function hideTypingIndicator() {
+            const indicator = document.getElementById('typing-indicator');
+            if (indicator) {
+                indicator.remove();
+            }
+        }
+
+        // 滚动到底部
+        function scrollToBottom() {
+            const container = document.getElementById('chat-container');
+            setTimeout(() => {
+                container.scrollTop = container.scrollHeight;
+            }, 100);
+        }
+
+        // 获取当前时间
+        function getCurrentTime() {
+            const now = new Date();
+            return now.toLocaleTimeString('zh-CN', {
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        // 更新在线状态
+        function updateOnlineStatus() {
+            const statusElement = document.getElementById('chat-user-status');
+            const statuses = ['在线', '刚刚在线', '5分钟前在线'];
+            const randomStatus = statuses[Math.floor(Math.random() * statuses.length)];
+            statusElement.textContent = randomStatus;
+        }
+
+        // 页面功能函数
+        function goBack() {
+            if (window.history.length > 1) {
+                window.history.back();
+            } else {
+                window.location.href = '/main-responsive.html';
+            }
+        }
+
+        function makeCall() {
+            layui.use('layer', function(){
+                const layer = layui.layer;
+                layer.open({
+                    type: 1,
+                    title: '语音通话',
+                    area: ['90%', '60%'],
+                    content: `
+                        <div style="padding: 20px; text-align: center;">
+                            <i class="fa fa-phone" style="font-size: 48px; color: #27ae60; margin-bottom: 15px;"></i>
+                            <h3>语音通话</h3>
+                            <p style="color: #666; margin-bottom: 20px;">正在呼叫 ${currentChatUser.name}...</p>
+                            <div style="margin-bottom: 20px;">
+                                <button class="layui-btn layui-btn-danger" onclick="layer.closeAll()">
+                                    <i class="fa fa-phone-slash"></i> 挂断
+                                </button>
+                            </div>
+                            <p style="font-size: 12px; color: #999;">语音通话功能开发中...</p>
+                        </div>
+                    `
+                });
+            });
+        }
+
+        function showMenu() {
+            layui.use('layer', function(){
+                const layer = layui.layer;
+                layer.open({
+                    type: 1,
+                    title: '更多选项',
+                    area: ['90%', '50%'],
+                    content: `
+                        <div style="padding: 20px;">
+                            <div style="margin-bottom: 15px;">
+                                <button class="layui-btn layui-btn-fluid" onclick="clearChat()">
+                                    <i class="fa fa-trash"></i> 清空聊天记录
+                                </button>
+                            </div>
+                            <div style="margin-bottom: 15px;">
+                                <button class="layui-btn layui-btn-normal layui-btn-fluid" onclick="reportUser()">
+                                    <i class="fa fa-flag"></i> 举报用户
+                                </button>
+                            </div>
+                            <div>
+                                <button class="layui-btn layui-btn-warm layui-btn-fluid" onclick="blockUser()">
+                                    <i class="fa fa-ban"></i> 屏蔽用户
+                                </button>
+                            </div>
+                        </div>
+                    `
+                });
+            });
+        }
+
+        function showEmoji() {
+            layui.use('layer', function(){
+                const layer = layui.layer;
+                layer.msg('表情功能开发中...', {icon: 0});
+            });
+        }
+
+        function clearChat() {
+            layui.use('layer', function(){
+                const layer = layui.layer;
+                layer.confirm('确定要清空聊天记录吗？', {
+                    btn: ['确定', '取消']
+                }, function(index) {
+                    // 清空聊天记录
+                    const container = document.getElementById('chat-container');
+                    container.innerHTML = `
+                        <div class="system-message">
+                            聊天记录已清空
+                        </div>
+                    `;
+                    chatData = [];
+
+                    layer.close(index);
+                    layer.closeAll();
+                    layer.msg('聊天记录已清空', {icon: 1});
+                });
+            });
+        }
+
+        function reportUser() {
+            layui.layer.closeAll();
+            layui.use('layer', function(){
+                const layer = layui.layer;
+                layer.msg('举报功能开发中...', {icon: 0});
+            });
+        }
+
+        function blockUser() {
+            layui.layer.closeAll();
+            layui.use('layer', function(){
+                const layer = layui.layer;
+                layer.msg('屏蔽功能开发中...', {icon: 0});
+            });
+        }
+    </script>
+</body>
+</html>

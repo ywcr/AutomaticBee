@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>联系人详情 - 精灵蜂</title>
+    <link rel="stylesheet" href="lgb/layui/css/layui.css">
+    <link rel="stylesheet" href="lgb/font-awesome/css/font-awesome.min.css">
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        /* 顶部导航 */
+        .header {
+            background: white;
+            padding: 15px 20px;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header .back-btn {
+            font-size: 20px;
+            color: #666;
+            cursor: pointer;
+            margin-right: 15px;
+        }
+
+        .header .title {
+            flex: 1;
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .header .edit-btn {
+            font-size: 18px;
+            color: #009688;
+            cursor: pointer;
+        }
+
+        /* 联系人基本信息 */
+        .contact-info {
+            background: white;
+            margin: 15px;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .contact-avatar {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #009688, #00796b);
+            color: white;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .contact-name {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .contact-type {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+            background: #e8f5e8;
+            color: #2e7d32;
+        }
+
+        .contact-meta {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+        }
+
+        .meta-item .icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+            font-size: 14px;
+            color: white;
+        }
+
+        .meta-item .icon.blue { background: #3498db; }
+        .meta-item .icon.green { background: #27ae60; }
+        .meta-item .icon.orange { background: #f39c12; }
+        .meta-item .icon.purple { background: #9b59b6; }
+
+        .meta-item .content {
+            flex: 1;
+        }
+
+        .meta-item .label {
+            font-size: 12px;
+            color: #999;
+            margin-bottom: 2px;
+        }
+
+        .meta-item .value {
+            font-size: 14px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        /* 详细信息 */
+        .contact-details {
+            background: white;
+            margin: 0 15px 15px 15px;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+
+        .section-title i {
+            margin-right: 8px;
+            color: #009688;
+        }
+
+        .detail-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+            padding: 12px;
+            background: #f9f9f9;
+            border-radius: 8px;
+        }
+
+        .detail-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .detail-row .label {
+            min-width: 80px;
+            font-weight: 500;
+            color: #666;
+            margin-right: 15px;
+        }
+
+        .detail-row .value {
+            flex: 1;
+            color: #333;
+        }
+
+        /* 操作按钮 */
+        .action-buttons {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            padding: 15px 20px;
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn-secondary {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #009688;
+            background: white;
+            color: #009688;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-secondary:hover {
+            background: #f0f9f8;
+        }
+
+        .btn-primary {
+            flex: 1;
+            padding: 12px;
+            background: #009688;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary:hover {
+            background: #00796b;
+        }
+
+        .btn-danger {
+            flex: 1;
+            padding: 12px;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-danger:hover {
+            background: #c0392b;
+        }
+
+        /* 加载状态 */
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+
+        .loading i {
+            font-size: 24px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* 响应式设计 */
+        @media (min-width: 768px) {
+            .contact-info, .contact-details {
+                margin: 15px auto;
+                max-width: 600px;
+            }
+            
+            .action-buttons {
+                max-width: 600px;
+                left: 50%;
+                transform: translateX(-50%);
+                border-radius: 12px 12px 0 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部导航 -->
+    <div class="header">
+        <div class="back-btn" onclick="goBack()">
+            <i class="fa fa-arrow-left"></i>
+        </div>
+        <div class="title">联系人详情</div>
+        <div class="edit-btn" onclick="editContact()">
+            <i class="fa fa-edit"></i>
+        </div>
+    </div>
+
+    <!-- 加载状态 -->
+    <div id="loading-container" class="loading">
+        <i class="fa fa-spinner"></i>
+        <div>加载中...</div>
+    </div>
+
+    <!-- 联系人内容 -->
+    <div id="contact-container" style="display: none; padding-bottom: 80px;">
+        <!-- 联系人基本信息 -->
+        <div class="contact-info">
+            <div class="contact-avatar">
+                <div class="avatar" id="contact-avatar">
+                    <i class="fa fa-user"></i>
+                </div>
+                <div class="contact-name" id="contact-name">加载中...</div>
+                <div class="contact-type" id="contact-type">-</div>
+            </div>
+            
+            <div class="contact-meta">
+                <div class="meta-item">
+                    <div class="icon blue">
+                        <i class="fa fa-venus-mars"></i>
+                    </div>
+                    <div class="content">
+                        <div class="label">性别</div>
+                        <div class="value" id="contact-gender">-</div>
+                    </div>
+                </div>
+                
+                <div class="meta-item">
+                    <div class="icon green">
+                        <i class="fa fa-phone"></i>
+                    </div>
+                    <div class="content">
+                        <div class="label">手机号</div>
+                        <div class="value" id="contact-phone">-</div>
+                    </div>
+                </div>
+                
+                <div class="meta-item">
+                    <div class="icon orange">
+                        <i class="fa fa-user-md"></i>
+                    </div>
+                    <div class="content">
+                        <div class="label">指派人</div>
+                        <div class="value" id="contact-assignee">-</div>
+                    </div>
+                </div>
+                
+                <div class="meta-item">
+                    <div class="icon purple">
+                        <i class="fa fa-clock-o"></i>
+                    </div>
+                    <div class="content">
+                        <div class="label">创建时间</div>
+                        <div class="value" id="contact-create-time">-</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 详细信息 -->
+        <div class="contact-details">
+            <div class="section-title">
+                <i class="fa fa-info-circle"></i>
+                详细信息
+            </div>
+            <div id="contact-details-list">
+                <!-- 动态生成 -->
+            </div>
+        </div>
+    </div>
+
+    <!-- 操作按钮 -->
+    <div class="action-buttons" id="action-buttons" style="display: none;">
+        <button class="btn-secondary" onclick="editContact()">
+            <i class="fa fa-edit"></i> 编辑
+        </button>
+        <button class="btn-primary" onclick="createQuestionnaire()">
+            <i class="fa fa-file-text-o"></i> 创建问卷
+        </button>
+        <button class="btn-danger" onclick="deleteContact()">
+            <i class="fa fa-trash"></i> 删除
+        </button>
+    </div>
+
+    <script src="lgb/layui/layui.js"></script>
+    <script src="lgb/js/jquery.min.js"></script>
+    <script>
+        let contactData = null;
+        let contactId = null;
+
+        // 页面加载完成
+        document.addEventListener('DOMContentLoaded', function() {
+            // 从URL参数获取联系人ID
+            const urlParams = new URLSearchParams(window.location.search);
+            contactId = urlParams.get('id') || urlParams.get('contactId');
+
+            if (!contactId) {
+                showError('联系人ID不存在');
+                return;
+            }
+
+            loadContactDetail();
+        });
+
+        // 加载联系人详情
+        async function loadContactDetail() {
+            try {
+                // 尝试从真实API加载联系人详情
+                const response = await fetch('/lgb/lxrgl/getDetail', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: `id=${contactId}`
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data && data.code === 0 && data.data) {
+                        contactData = data.data;
+                        renderContactDetail();
+                        return;
+                    }
+                }
+
+                // API失败，使用模拟数据
+                throw new Error('API调用失败');
+
+            } catch (error) {
+                console.log('联系人详情加载失败，使用模拟数据:', error);
+                contactData = generateMockContactDetail();
+                renderContactDetail();
+            }
+        }
+
+        // 生成模拟联系人详情
+        function generateMockContactDetail() {
+            const names = ['张三', '李四', '王五', '赵六', '钱七'];
+            const types = ['患者', '医生', '药师', '其他'];
+            const assignees = ['张医生', '李护士', '王主任', '赵医师'];
+
+            return {
+                recId: contactId,
+                name: names[Math.floor(Math.random() * names.length)],
+                sex: Math.random() > 0.5 ? '男' : '女',
+                lxrType: types[Math.floor(Math.random() * types.length)],
+                assignee: assignees[Math.floor(Math.random() * assignees.length)],
+                phone: '138' + Math.floor(Math.random() * 100000000).toString().padStart(8, '0'),
+                address: '北京市朝阳区某某街道某某号',
+                hospitalName: '北京某某医院',
+                departmentName: '内科',
+                create_time: new Date(Date.now() - Math.floor(Math.random() * 30) * 24 * 60 * 60 * 1000).toISOString()
+            };
+        }
+
+        // 渲染联系人详情
+        function renderContactDetail() {
+            if (!contactData) return;
+
+            // 隐藏加载状态，显示内容
+            document.getElementById('loading-container').style.display = 'none';
+            document.getElementById('contact-container').style.display = 'block';
+            document.getElementById('action-buttons').style.display = 'flex';
+
+            // 基本信息
+            document.getElementById('contact-name').textContent = contactData.name || '未知联系人';
+            document.getElementById('contact-type').textContent = contactData.lxrType || contactData.contactType || '未知类型';
+            document.getElementById('contact-gender').textContent = contactData.sex || contactData.gender || '未知';
+            document.getElementById('contact-phone').textContent = contactData.phone || '未填写';
+            document.getElementById('contact-assignee').textContent = contactData.assignee || '未指派';
+            document.getElementById('contact-create-time').textContent = formatDate(contactData.create_time || contactData.createTime);
+
+            // 设置头像
+            const avatar = document.getElementById('contact-avatar');
+            const name = contactData.name || '?';
+            avatar.textContent = name.charAt(0);
+
+            // 渲染详细信息
+            renderContactDetails();
+        }
+
+        // 渲染详细信息
+        function renderContactDetails() {
+            const container = document.getElementById('contact-details-list');
+            const details = [
+                { label: '地址', value: contactData.address || '未填写' },
+                { label: '医院名称', value: contactData.hospitalName || '未填写' },
+                { label: '科室', value: contactData.departmentName || '未填写' },
+                { label: '备注', value: contactData.remark || '无' }
+            ];
+
+            const html = details.map(detail => `
+                <div class="detail-row">
+                    <div class="label">${detail.label}：</div>
+                    <div class="value">${detail.value}</div>
+                </div>
+            `).join('');
+
+            container.innerHTML = html;
+        }
+
+        // 格式化日期
+        function formatDate(dateStr) {
+            if (!dateStr) return '未知';
+
+            try {
+                const date = new Date(dateStr);
+                return date.toLocaleDateString('zh-CN', {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+            } catch (error) {
+                return dateStr;
+            }
+        }
+
+        // 显示错误信息
+        function showError(message) {
+            document.getElementById('loading-container').innerHTML = `
+                <div style="text-align: center; padding: 40px; color: #e74c3c;">
+                    <i class="fa fa-exclamation-triangle" style="font-size: 48px; margin-bottom: 15px;"></i>
+                    <h3>加载失败</h3>
+                    <p>${message}</p>
+                    <button class="layui-btn" onclick="goBack()">返回</button>
+                </div>
+            `;
+        }
+
+        // 页面功能函数
+        function goBack() {
+            if (window.history.length > 1) {
+                window.history.back();
+            } else {
+                window.location.href = '/automation-dashboard.html';
+            }
+        }
+
+        function editContact() {
+            // 跳转到编辑页面或打开编辑模态框
+            window.location.href = `/automation-dashboard.html?tab=contacts&action=edit&id=${contactId}`;
+        }
+
+        function createQuestionnaire() {
+            layui.use('layer', function(){
+                const layer = layui.layer;
+                layer.msg('创建问卷功能开发中...', {icon: 0});
+            });
+        }
+
+        function deleteContact() {
+            layui.use('layer', function(){
+                const layer = layui.layer;
+                layer.confirm('确定要删除这个联系人吗？此操作不可恢复。', {
+                    btn: ['确定删除', '取消'],
+                    title: '删除确认'
+                }, function(index) {
+                    performDeleteContact();
+                    layer.close(index);
+                });
+            });
+        }
+
+        async function performDeleteContact() {
+            const layer = layui.layer;
+            const loadingIndex = layer.load(2, {shade: [0.3, '#000']});
+
+            try {
+                const response = await fetch('/lgb/lxrgl/delete', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: `id=${contactId}`
+                });
+
+                const result = await response.json();
+
+                if (result.code === 0) {
+                    layer.close(loadingIndex);
+                    layer.msg('联系人删除成功！', {icon: 1, time: 2000});
+                    
+                    // 延迟返回上一页
+                    setTimeout(() => {
+                        goBack();
+                    }, 2000);
+                } else {
+                    layer.close(loadingIndex);
+                    layer.msg('删除失败: ' + (result.message || '未知错误'), {icon: 2});
+                }
+
+            } catch (error) {
+                layer.close(loadingIndex);
+                console.log('联系人删除失败:', error);
+                layer.msg('删除失败，请重试', {icon: 2});
+            }
+        }
+    </script>
+</body>
+</html>

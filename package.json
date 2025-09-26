@@ -1,0 +1,59 @@
+{
+  "name": "zxyy-electron",
+  "version": "1.0.0",
+  "description": "精灵蜂任务管理平台 - Electron版本",
+  "main": "src/main/main.js",
+  "scripts": {
+    "start": "concurrently \"npm run start-proxy\" \"npm run start-electron\"",
+    "dev": "concurrently \"npm run start-proxy\" \"npm run start-electron\"",
+    "start-electron": "ping 127.0.0.1 -n 3 >nul && electron .",
+    "start-proxy": "node src/main/proxy-server.js",
+    "build": "electron-builder",
+    "build-win": "electron-builder --win",
+    "build-mac": "electron-builder --mac",
+    "build-linux": "electron-builder --linux"
+  },
+  "keywords": [
+    "electron",
+    "zxyy",
+    "task-management",
+    "精灵蜂"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "electron": "^27.0.0",
+    "electron-builder": "^24.6.4"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "electron-fetch": "^1.9.1",
+    "electron-store": "^8.1.0",
+    "express": "^4.18.2",
+    "http-proxy-middleware": "^2.0.6",
+    "uuid": "^9.0.1",
+    "xlsx": "^0.18.5"
+  },
+  "build": {
+    "appId": "com.zxyy.electron",
+    "productName": "精灵蜂任务管理平台",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "src/**/*",
+      "assets/**/*",
+      "node_modules/**/*"
+    ],
+    "mac": {
+      "category": "public.app-category.productivity"
+    },
+    "win": {
+      "target": "nsis"
+    },
+    "linux": {
+      "target": "AppImage"
+    }
+  }
+}

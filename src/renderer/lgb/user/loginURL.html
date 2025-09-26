@@ -1,0 +1,727 @@
+
+
+<!DOCTYPE html>
+<html>
+<head>
+
+<meta charset="UTF-8">
+<title>精灵蜂-登录页面</title>
+<META name="viewport" content="width=device-width,height=device-height,inital-scale=1.0,maximum-scale=1.0,user-scalable=no;" />
+<META HTTP-EQUIV="pragma" CONTENT="no-cache">
+<META HTTP-EQUIV="Cache-Control" CONTENT="no-cache, must-revalidate">
+<META HTTP-EQUIV="expires" CONTENT="0">
+<link rel="icon" href="/lgb/images/jp.png"  type="image/x-icon">
+<link href="/lgb/layui/css/layui.css" rel="stylesheet" />
+<link rel="stylesheet" href="/lgb/mobile/css/main.css" />
+<link rel="stylesheet" href="/lgb/mobile/css/login.css" />
+<link rel="apple-touch-icon" href="/lgb/images/jp.png">
+    <!-- 国内使用 -->
+    <script type="text/javascript" charset="utf-8" src="//g.alicdn.com/sd/ncpc/nc.js?t=2015052012"></script>
+<style type="text/css">
+body{
+   display:none
+}
+header {
+    height:50px;
+    width:90%;
+    text-align: center;
+    margin:120px 5%  20px 5%;
+    display:table
+}
+header img {
+    height:50px;
+    margin-bottom:12px;
+}
+header b {
+    height:69px;
+    line-height:69px;
+    font-size:26px;
+}
+.layui-tab-title {
+    display: flex;
+    border-bottom: none;
+}
+.secondTab {
+    flex: 3;
+}
+.secondTab div {
+    //width: fit-content;
+    margin: 0 auto;
+}
+input.layui-input {
+    text-align: left
+}
+.layui-tab-item {
+    padding-top: 30px
+}
+#awen.layui-layer-content {
+	overflow: auto
+}
+.layui-tab-title li {
+    flex: 1
+}
+.layui-tab-title li div {
+    height: 100%
+}
+.layui-this div {
+    border-bottom: 2px solid #fc9e2b
+}
+.layui-tab-brief>.layui-tab-title .layui-this {
+    color: #fc9e2b;
+    font-weight: 600;
+}
+.layui-tab-brief>.layui-tab-title .layui-this:after {
+    border: none
+}
+.yhzc , .remember_span {
+    font-size:12px;
+    margin-top:10px;
+    display:inline-block;
+    margin-left:10px
+}
+.yhzc a {
+    text-decoration: underline;
+    margin-left: 10px;
+}
+.layui-form-checked[lay-skin=primary] i {
+    border-color: #fc9e2b !important;
+    background-color: #fc9e2b;
+}
+.layui-form-checkbox[lay-skin=primary]:hover i {
+    border-color: #fc9e2b !important;
+}
+button[lay-submit] {
+    font-weight:bold;width:90%;margin-top: 20px;
+    background: #fc9e2b;
+    border-radius: 8px
+}
+.layui-form-pane, .base_row {
+    width: 90%;
+    margin: 0px 5% !important;
+}
+.base_row i {
+    position: absolute;
+    left:10px;
+    top:10px;
+    color:#666;
+}
+.base_row input {
+    padding-left:30px;
+    border-radius:8px
+}
+.base_row_top {
+    margin-top: 20px !important;
+}
+.verifyCodeBtn {
+    width:50%;
+    background:#fc9e2b;
+    color:#fff;
+    font-weight:bold;
+}
+.layui-form-pane .layui-form-checkbox {
+    margin-top: 1px !important;
+}
+.sm-pop-inner {
+    left: 0 !important;
+    box-sizing: border-box;
+    padding: 0 5px;
+}
+
+.nc-container #nc_1_wrapper {
+    width: 100% !important;
+}
+
+
+</style>
+<script src="https://g.alicdn.com/AWSC/AWSC/awsc.js"></script>
+</head>
+<body>
+
+
+
+<!-- logo头部 -->
+<header>
+    <img src="../images/jp.png">
+    <b> 精灵蜂</b>
+</header>
+
+<!-- 主体内容 -->
+<main class="layui-tab layui-tab-brief" lay-filter="docDemoTabBrief">
+
+    <ul class="layui-tab-title" style="display: flex; border-bottom: none">
+        <li class="layui-this t1"><div>用户登录</div></li>
+        <li class="secondTab t2"><div>忘记密码</div></li>
+        <li class="t3"><div>用户注册</div></li>
+    </ul>
+
+    <div class="layui-tab-content">
+
+        <!-- 用户登录 -->
+        <div class="layui-tab-item layui-show">
+            <form class="layui-form layui-form-pane" id="loginForm" lay-filter="loginForm">
+                <div class="layui-input-block base_row">
+                    <i class="layui-icon layui-icon-cellphone"></i>
+                    <input type="text" name="userCode" class="layui-input" placeholder="请输入手机号" lay-verify="required|phone" id="userCode" autocomplete="off">
+                </div>
+                <div class="layui-input-block base_row base_row_top">
+                    <i class="layui-icon layui-icon-password"></i>
+                    <input type="password" name="password" id="password" placeholder="请输入密码，8~16位，包含大小写字母和数字" class="layui-input" lay-verify="required" autocomplete="off">
+                </div>
+                <div id="loginMsgInfo" style="font-size: 12px;text-align: left;color: red;margin: 15px 15px 0px 15px;display: none;">
+                </div>
+                <input type="hidden" name="cssessionId">
+                <input type="hidden" name="sig">
+                <input type="hidden" name="token">
+                <input type="hidden" name="scene" value="nc_login">
+                <input type="hidden" name="appKey" value="FFFF0N0000000000B194">
+
+                <div class="layui-input-block base_row base_row_top">
+                    <div id="nc" class="nc-container"></div>
+                </div>
+
+                <span class="yhzc">
+                    <input type="checkbox" name="isSign" title="" lay-skin="primary"><div style="display: unset"></div>
+                </span>
+                <span class="remember_span">
+                    <input type="checkbox" name="isRemember" title="" lay-skin="primary">记住手机号和密码
+                </span>
+                <center><button lay-submit class="layui-btn">登录</button></center>
+            </form>
+        </div>
+
+        <!-- 忘记密码 -->
+        <div class="layui-tab-item">
+            <form class="layui-form layui-form-pane" id="forgetForm" lay-filter="forgetForm">
+                <div class="layui-input-block base_row">
+                    <i class="layui-icon layui-icon-cellphone"></i>
+                    <input type="text" name="phone" class="layui-input" lay-verify="required|phone" placeholder="请输入手机号" autocomplete="off">
+                </div>
+                <div class="layui-input-block base_row base_row_top" >
+                    <i class="layui-icon layui-icon-vercode"></i>
+                    <input type="text" name="captcha" autocomplete="off" class="layui-input" lay-verify="required" style="width:50%;float:left" placeholder="请输入验证码">
+                    <button type="button" class="layui-btn verifyCodeBtn" id="yzmBtn2" >获取验证码</button>
+                </div>
+                <div class="layui-input-block base_row base_row_top">
+                    <i class="layui-icon layui-icon-password"></i>
+                    <input type="password" name="pwd" lay-verify="pass" onchange="inputTextLimits(this,value,'2')"
+                           placeholder="请输入密码，8~16位，包含大小写字母和数字" class="layui-input" autocomplete="off">
+                </div>
+                <div class="layui-input-block base_row base_row_top">
+                    <i class="layui-icon layui-icon-password"></i>
+                    <input type="password" name="pwd2" lay-verify="repass2" onchange="inputTextLimits(this,value,'2')"
+                           placeholder="请输入密码，8~16位，包含大小写字母和数字" class="layui-input" autocomplete="off">
+                </div>
+                <input type="hidden" name="sendTimestamp">
+                <center><button lay-submit class="layui-btn" id="forgetBtn">提交</button></center>
+            </form>
+        </div>
+
+        <!-- 用户注册 -->
+        <div class="layui-tab-item">
+            <form class="layui-form layui-form-pane" id="registForm" lay-filter="registForm">
+                <input type="hidden" name="registType"  value="自由职业者">
+                <div class="layui-input-block base_row">
+                    <i class="layui-icon layui-icon-cellphone"></i>
+                    <input type="text" name="phone" class="layui-input" lay-verify="required|phone" placeholder="请输入手机号" autocomplete="off">
+                </div>
+                <div class="layui-input-block base_row base_row_top" >
+                    <i class="layui-icon layui-icon-vercode"></i>
+                    <input type="text" name="captcha" autocomplete="off" class="layui-input" lay-verify="required" style="width:50%;float:left" placeholder="请输入验证码">
+                    <button type="button" class="layui-btn verifyCodeBtn" id="yzmBtn" >获取验证码</button>
+                </div>
+                <div class="layui-input-block base_row base_row_top">
+                    <i class="layui-icon layui-icon-password"></i>
+                    <input type="password" name="pwd" lay-verify="pass" onchange="inputTextLimits(this,value,'2')"
+                           placeholder="请输入密码，8~16位，包含大小写字母和数字" class="layui-input" autocomplete="off">
+                </div>
+                <div class="layui-input-block base_row base_row_top">
+                    <i class="layui-icon layui-icon-password"></i>
+                    <input type="password" name="pwd2" lay-verify="repass" onchange="inputTextLimits(this,value,'2')"
+                           placeholder="请输入密码，8~16位，包含大小写字母和数字" class="layui-input" autocomplete="off">
+                </div>
+                <input type="hidden" name="cssessionId" class="registerSessionId">
+                <input type="hidden" name="sig" class="registerSig">
+                <input type="hidden" name="token" class="registerToken">
+                <input type="hidden" name="scene" value="ic_login_h5">
+                <input type="hidden" name="appKey" value="FFFF0N0000000000B194">
+                <div class="layui-input-block base_row base_row_top">
+                    <div id="sc" style="margin: 0; padding: 0;"></div>
+                </div>
+                <input type="hidden" name="sendTimestamp">
+                <span class="yhzc">
+                    <input type="checkbox" name="isSign" title="" lay-skin="primary"><div style="display: unset"></div>
+                </span>
+                <center><button lay-submit class="layui-btn">注册</button></center>
+                <center><p style="line-height: 50px; font-weight: 600;">为了成功收款请使用银行卡预留手机号注册</p></center>
+            </form>
+        </div>
+    </div>
+
+    <form id="agreementPolicyForm">
+        <input type="hidden" name="empId" id="empId" value="">
+        <input type="hidden" name="empType" id="empType" value="">
+        <input type="hidden" name="pwd" id="pwd" value="">
+        <input type="hidden" name="phone" id="phone" value="">
+    </form>
+</main>
+
+<script src="/lgb/layui/layui.js"></script>
+<script src="/lgb/js/awen-ajax.js"></script>
+<script src="//g.alicdn.com/sd/nvc/1.1.112/guide.js"></script>
+<script src="//g.alicdn.com/sd/smartCaptcha/0.0.1/index.js"></script>
+<script>
+    var $
+    let xyNames, plus, element, form, layer
+    let reg = /^1\d{10}$/
+    layui.use(['layer', 'form', 'jquery', 'element'], ()=> {
+        form = layui.form
+        layer = layui.layer
+        $ = layui.jquery
+        element  = layui.element
+
+        //同步校验是否已经登录
+        syncAjax(checkAlreadyLogin)
+
+        //加载自定义校验规则
+        loadVerifyRule()
+
+        //默认加载用户协议和隐私政策
+        loadAgreement()
+
+        //记住手机号和密码
+        remember_phone_pwd()
+
+
+        element.on('tab(docDemoTabBrief)', function(data){
+
+            resetNc()
+
+        });
+
+
+        function resetNc() {
+            $('.registerSessionId').val("")
+            $('.registerSig').val("")
+            $('.registerToken').val("")
+            $('[name="cssessionId"]').val("")
+            $('[name="sig"]').val("")
+            $('[name="token"]').val("")
+            window.nc.reset()
+            window.ic.reset()
+        }
+
+
+
+        //监听[用户登录]提交
+        form.on('submit(loginForm)', ()=> {
+            if (
+                strIsEmpty($('[name="cssessionId"]').val()) ||
+                strIsEmpty($('[name="sig"]').val()) ||
+                strIsEmpty($('[name="token"]').val())
+            ) {
+                layer.msg("请先进行验证")
+                return false
+            }
+            protocolCheck("#loginForm", ()=> {
+                loading()
+                document.getElementById("loginMsgInfo").style.display = "none";
+                $("#loginForm [lay-submit]").attr("disabled", true)//禁用按钮
+                $.post("/lgb/user/mobileLogin", $("#loginForm").serialize(), data=> {
+                    timeout_2000(() => {
+                        $("#loginForm [lay-submit]").attr("disabled", false)//恢复按钮
+                    })
+                    closeLoading()
+                    if (data.code == "0") {
+
+                        let user = data.data
+                        $("#empId").val(user.recId)
+                        $('#empType').val(user.identity_alias)
+                        $('#pwd').val($('#password').val())
+                        $('#phone').val(user.mobile)
+                        loginSuccessHandle()
+                    }else if (data.code == "-3") {
+                        let messageStr = data.message.replace(`<a>`,`<a href='javascript:void(0)' style='color:#1E9FFF;' class="onclickForgetPwd">`);
+                        $("#loginMsgInfo").html(messageStr);
+                        document.getElementById("loginMsgInfo").style.display = "block";
+                        resetNc();
+                    } else {
+                        resetNc()
+                        layer.alert(data.message, {icon: 5, offset: "35%", area: '90%'})
+                    }
+                })
+            })
+	        return false
+	    })
+
+        $("body").delegate(".onclickForgetPwd", "click", function (e) {
+            // 触发忘记密码
+            $(".secondTab").click();
+        })
+
+        //监听[忘记密码]提交
+        form.on('submit(forgetForm)', ()=> {
+           pwdLengthCheck("#forgetForm", ()=> {
+                loading()
+                $('#forgetBtn').addClass("layui-btn-disabled");
+                $('#forgetBtn').attr('disabled', 'disabled');
+                $.post("/lgb/user/forgetPwd", $("#forgetForm").serialize(), res=> {
+                    closeLoading()
+                    if(res.code == 200) {
+                        layer.msg("操作成功！", {icon: 6})
+                        setTimeout(function(){
+                            location.reload()
+                        },1000)
+                    }
+                    else {
+                        $('#forgetBtn').removeClass("layui-btn-disabled");
+                        $('#forgetBtn').removeAttr('disabled');
+                        layer.msg(res.message, {icon:5})
+                        //layer.msg(res.message, {icon:5})
+                        //getVertifyError(res)
+                    }
+                })
+            })
+            return false
+        })
+
+        //监听[用户注册]提交
+        form.on('submit(registForm)', ()=> {
+            if (
+                strIsEmpty($('.registerSessionId').val()) ||
+                strIsEmpty($('.registerSig').val()) ||
+                strIsEmpty($('.registerToken').val())
+            ) {
+                layer.msg("请先进行验证")
+                return false
+            }
+
+            protocolCheck("#registForm", ()=> {
+                pwdLengthCheck("#registForm", ()=> {
+                    loading()
+                    $.post("/lgb/user/regist", $("#registForm").serialize(), res=> {
+                        closeLoading()
+                        if(res.code == 200) {
+                            layer.open({
+                                id: "awen",
+                                type: 2,
+                                closeBtn: 0,
+                                title: '信息完善',
+                                skin: 'layui-layer-molv',
+                                area: ['95%', '90%'], //宽高
+                                content: "/lgb/myInfo_regist_mobile.jsp?empCode=" + res.data
+                            })
+                        } else {
+                            resetNc()
+                            //getVertifyError(data.code)
+                            layer.msg(res.message, {icon:5})
+                        }
+                    })
+                })
+            })
+            return false
+        })
+
+        //用户注册 - 验证码
+        $("#yzmBtn").click(()=> {
+            let phone = $("#registForm [name=phone]").val()
+            phoneForamatCheck(phone, "#registForm [name=phone]", ()=> {
+                loading()
+                $.post("/lgb/user/sendRegistVerifyCode",{mobile: phone}, d=> {
+                    sendVertifyCodeHandle("#yzmBtn", d)
+                })
+            })
+        })
+
+        //忘记密码 - 验证码
+        $("#yzmBtn2").click(()=> {
+            let phone = $("#forgetForm [name=phone]").val()
+            phoneForamatCheck(phone, "#forgetForm [name=phone]", ()=> {
+                loading()
+                $.post("/lgb/user/sendForgetPasswordVerifyCode", {mobile: phone}, d=> {
+                     sendVertifyCodeHandle("#yzmBtn2", d)
+                })
+            })
+        })
+
+    })
+
+    //获取验证码失败
+    function getVertifyError(code) {
+        if(code == "-1"){
+            layer.msg("此手机号已注册！", {icon:5})
+        }else if(code == "-2") {
+            layer.msg("手机验证码错误！", {icon:5})
+        }else if(code == "-3") {
+            layer.msg("手机验证码失效！", {icon:5})
+        }else if(code == "-4") {
+            layer.msg("贵企业已被禁止登录 ", {icon: 5, time: 1000})
+        }
+    }
+
+
+
+    //勾选协议校验
+    function protocolCheck(dom ,fn) {
+        if($(dom + " [name=isSign]").prop("checked")) {
+            fn()
+        } else {
+            layer.msg("请阅读并同意遵守《用户协议》和《隐私政策》")
+        }
+    }
+
+    //密码长度校验
+    function pwdLengthCheck(dom, fn) {
+        if ($(dom + " [name=pwd]").val().length >= 8 && $(dom + " [name=pwd]").val().length <= 16) {
+            fn()
+        } else {
+            layer.msg("密码长度不能低于8位不能超过16位！", {icon:5})
+        }
+    }
+
+    //发送验证码的返回处理
+    function sendVertifyCodeHandle(dom, d) {
+        closeLoading()
+        if(d.code == 200) {
+            countdownScheduleTask(dom)
+        }
+        else {
+           layer.msg(d.message, {icon: 5})
+        }
+        // if (d == "-1") {
+        //     layer.msg("手机号码非法！", {icon: 5})
+        // } else if (d == "-2") {
+        //     layer.msg("系统不存在此手机号！", {icon: 5})
+        // } else {
+        //     countdownScheduleTask(dom)
+        // }
+    }
+
+    //手机号格式主动校验
+    function phoneForamatCheck(phone, dom, fn) {
+        if(reg.test(phone)) fn()
+        else phoneCheckMsg(dom)
+    }
+
+    //手机号校验提示
+    function phoneCheckMsg(dom) {
+        $(dom).focus()
+        layer.msg("请输入正确的手机号",{time:1500,icon:5})
+    }
+
+    //倒计时定时任务
+    function countdownScheduleTask(dom) {
+        //$(dom).parents("form").find("[name=sendTimestamp]").val(d)
+        $(dom).attr("disabled", true)
+        $(dom).addClass("layui-btn-disabled")
+        let t = 60
+        let clock = setInterval(function () {
+            if (t > 0) {
+                t--
+                $(dom).html(t + "s")
+            } else {
+                clearInterval(clock)
+                $(dom).html("重新获取")
+                $(dom).attr("disabled", false)
+                $(dom).removeClass("layui-btn-disabled")
+            }
+        }, 1000)
+    }
+
+    //校验是否已经登录，已经是登录状态就跳转到主页面
+    function checkAlreadyLogin() {
+        $.post("/lgb/user/isAuthenticated",function(res){
+            if(res) location.href = "app.jsp"
+            else $("body").css("display","block")
+        })
+    }
+
+    //签署最新协议政策，此接口只处理未签署的
+    function areUserAgreementPolicy() {
+        $.post("/lgb/user/xyzcYes", $("#agreementPolicyForm").serialize(), ()=> {
+        })
+    }
+
+    //加载用户协议和隐私政策
+    function loadAgreement() {
+        $.post("/lgb/xymbgl/yhxyYszc", function(res) {
+            if(res.code == 200) {
+                if(res.data) {
+                    let d = res.data;
+                    let h = ""
+                    xyNames = ""
+                    for(let i=0; i<d.length; i++) {
+                        let xyName = d[i].protocolType == 1 ? "用户协议" : "隐私政策";
+                        h += "<a onclick = xy('"+xyName+"','"+encodeURI(d[i].protocolText)+"')>《"+xyName+"》</a>"
+                        xyNames += "《"+xyName+"》"
+                    }
+                    $(".yhzc div").html(`已阅读并同意遵守` + h)
+                    form.render()
+                }
+            } else {
+                layer.msg(res.message,{time:1500,icon:5})
+            }
+        })
+    }
+/*    function loadAgreement() {
+        $.post("/lgb/xymbgl/yhxyYszc", function(d) {
+            let h = ""
+            xyNames = ""
+            for(let i=0; i<d.length; i++) {
+                var name = "";
+                if(d[i].xyType == "用户协议") {
+                    name = "用户协议";
+                }else if(d[i].xyType == "隐私政策") {
+                    name = "隐私政策";
+                }
+                h += "<a onclick = xy('"+d[i].xyName+"','"+encodeURI(d[i].xyContent)+"')>《"+name+"》</a>"
+                xyNames += "《"+d[i].xyName+"》"
+                if(d[i].xyType == "用户协议") {
+                    $("[name=newYhxyId]").val(d[i].id)
+                    $("[name=newYhxyName]").val(d[i].xyName)
+                }
+                if(d[i].xyType == "隐私政策") {
+                    $("[name=newYszcId]").val(d[i].id)
+                    $("[name=newYszcName]").val(d[i].xyName)
+                }
+            }
+            $(".yhzc div").html(`已阅读并同意遵守` + h)
+            form.render()
+        })
+    }*/
+
+    AWSC.use("ic", function (state, module) {
+        // 初始化
+        window.ic = module.init({
+            // 应用类型标识。它和使用场景标识（scene字段）一起决定了智能验证的业务场景与后端对应使用的策略模型。您可以在阿里云验证码控制台的配置管理页签找到对应的appkey字段值，请务必正确填写。
+            appkey: "FFFF0N0000000000B194",
+            // 使用场景标识。它和应用类型标识（appkey字段）一起决定了智能验证的业务场景与后端对应使用的策略模型。您可以在阿里云验证码控制台的配置管理页签找到对应的scene值，请务必正确填写。
+            scene: "ic_login_h5",
+            // 声明智能验证需要渲染的目标元素ID。
+            renderTo: 'sc',
+            width: '100%',
+            // 验证通过时会触发该回调参数。您可以在该回调参数中将会话ID（sessionId）、签名串（sig）、请求唯一标识（token）字段记录下来，随业务请求一同发送至您的服务端调用验签。
+            success: function (data) {
+                $('.registerSessionId').val(data.sessionId)
+                $('.registerSig').val(data.sig)
+                $('.registerToken').val(data.token)
+            },
+            // 验证失败时触发该回调参数
+            fail: function (failCode) {
+                console.log(failCode)
+            },
+            // 验证码加载异常时触发该回调参数
+            error: function (errorCode) {
+                console.log(errorCode)
+            }
+        });
+    })
+
+
+    var nc_token = ["FFFF0N0000000000B194", (new Date()).getTime(), Math.random()].join(':');
+    var NC_Opt = {
+        renderTo: '#nc',
+        appkey: "FFFF0N0000000000B194",
+        scene: "nc_login",
+        token: nc_token,
+        customWidth: '100%',
+        trans: { "key1": "code0" },
+        elementID: ["usernameID"],
+        is_Opt: 0,
+        language: "cn",
+        isEnabled: true,
+        timeout: 3000,
+        times: 5,
+        apimap: {
+        },
+        callback: function (data) {
+            $('[name="cssessionId"]').val(data.csessionid)
+            $('[name="sig"]').val(data.sig)
+            $('[name="token"]').val(data.token)
+        },
+        error: function (s) {
+        }
+    };
+    var nc = new noCaptcha(NC_Opt)
+    nc.upLang('cn', {
+        _startTEXT: "请按住滑块，拖动到最右边",
+        _yesTEXT: "验证通过",
+        _error300: "哎呀，出错了，点击<a href=\"javascript:__nc.reset()\">刷新</a>再来一次",
+        _errorNetwork: "网络不给力，请<a href=\"javascript:__nc.reset()\">点击刷新</a>",
+    })
+
+
+
+    //记住手机号和密码
+    function remember_phone_pwd() {
+        let isRememberLocal = layui.data('isRemember')
+        if(isRememberLocal.phone != null){
+            $("[name='userCode']").val(isRememberLocal.phone)
+            $("[name='password']").val(isRememberLocal.pwd)
+            $("[name='isRemember']").attr("checked","checked")
+            form.render()
+        } else {
+            $("[name='isRemember']").attr('checked', false)
+            form.render()
+        }
+    }
+
+    //查看协议
+    function xy(xyName,xyContent) {
+        layer.open({
+			type:1,
+			id:'awen',
+			title:xyName,
+			skin: 'layui-layer-rim',
+			area: ['90%','80%'],
+			offset:'10%',
+			content:"<div style='padding:10px'>"+decodeURI(xyContent)+"</div>"
+		})
+    }
+
+    //登录成功
+    function loginSuccessHandle() {
+        areUserAgreementPolicy()
+        rememberPwd()
+        layer.msg("登录成功", {time:1000})
+        timeout_1000(()=> {
+            if (plus) plus.webview.create("http://jlf-svc:8080/lgb/mobile/app.jsp?flag=true", "mobile_app_jsp" ).show()
+            else parent.location.href="/lgb/mobile/app.jsp?flag=true"
+        })
+    }
+
+    //判断情况决定是否记住手机和密码
+    function rememberPwd() {
+     	 if($("[name=isRemember]").prop("checked")) {
+            layui.data('isRemember', {
+                 key: 'phone'
+                 ,value: $("[name=userCode]").val()
+            })
+            layui.data('isRemember', {
+                 key: 'pwd'
+                 ,value: $("[name=password]").val()
+            })
+   	     } else {
+            layui.data('isRemember', null)
+   	     }
+    }
+
+    //自定义验证规则
+    function loadVerifyRule() {
+        form.verify({
+            //用户注册
+            repass: value=> {
+                if (value != $('#registForm [name=pwd]').val()) {
+                    return '密码不一致哦'
+                }
+            },
+            //忘记密码
+            repass2: value=> {
+                if (value != $('#forgetForm [name=pwd]').val()) {
+                    return '密码不一致哦'
+                }
+            }
+        })
+    }
+</script>
+</body>
+</html>

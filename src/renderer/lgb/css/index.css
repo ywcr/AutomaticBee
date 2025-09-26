@@ -1,0 +1,498 @@
+.fa-fw {
+  margin-right: 5px;
+}
+.layui-layout-admin .layui-footer {
+  left: 0px;
+}
+
+.layui-layout-admin .layui-logo {
+  /* left: 120px;
+	width:230px; */
+}
+
+.layui-body {
+  left: 0px;
+}
+
+.layui-layout-right {
+  /* right: 100px; */
+  /*padding-right:100px;*/
+}
+
+#tb1 tr td:first-child {
+  color: #000;
+  font-weight: 600;
+}
+
+#tb1 tr > td + td {
+  cursor: pointer;
+}
+
+#content > div + div {
+  margin-top: 20px;
+}
+
+.layui-form-label b {
+  color: red;
+}
+
+.layui-nav-child .layui-btn-xs {
+  font-size: 10px;
+}
+
+#headImg {
+  width: 32px;
+  height: 32px;
+  border-radius: 16px;
+}
+
+#awen.layui-layer-content {
+  overflow: auto;
+}
+#awen2.layui-layer-content {
+  overflow: auto;
+}
+
+[name="projectId"] + .layui-form-select {
+  width: 250px;
+  float: left;
+}
+
+.bg {
+  background: #d6ecd6;
+}
+
+/*�ܼҵ�����Ƥ��*/
+body .steward {
+  top: auto !important;
+  left: auto !important;
+  bottom: 0px;
+  right: 0px;
+  -moz-box-shadow: none !important;
+  -webkit-box-shadow: none !important;
+  box-shadow: none !important;
+  text-align: center;
+  background-color: transparent;
+}
+
+body .steward .layui-layer-title {
+  background: rgb(136, 206, 196);
+  font-size: 16px;
+  text-shadow: 0 0 6px #1e9fff;
+  color: #fff;
+  padding: 0;
+  cursor: default !important;
+  border: none;
+}
+
+body .steward .layui-layer-content {
+  background: rgb(245, 249, 250);
+  color: rgb(135, 135, 135);
+}
+
+body .steward .layui-layer-content > p {
+  height: 30px;
+  line-height: 30px;
+  /* margin: 10px 0; */
+}
+
+body .steward .layui-layer-content > p > span {
+  color: rgb(109, 109, 109);
+  padding: 0 2px;
+}
+
+body .steward .layui-layer-content > p > a {
+  color: #1e9fff;
+  padding: 0 5px;
+}
+
+body .steward .layui-layer-content .notnotice {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  padding: 5px 10px;
+  cursor: pointer;
+  background: rgb(236, 143, 151);
+  font-size: 12px;
+  color: azure;
+}
+/*�ܼҵ�����Ƥ��END*/
+.msgTitle {
+  text-align: left;
+  text-indent: 10px;
+  color: #009688;
+  font-weight: 600;
+}
+
+#myMsgBox .layui-badge {
+  border-radius: 50%;
+  display: none;
+}
+
+#myMsg .layui-badge {
+  border-radius: 50%;
+  display: none;
+}
+
+.layui-row {
+  padding: 0px 15px;
+}
+
+#allMsg .layui-row {
+  border: 2px solid #f2f2f2;
+  padding: 5px 15px;
+}
+
+.layui-row h4 {
+  line-height: 30px;
+  font-weight: 700px;
+}
+
+#allMsg .layui-row p {
+  color: #4e4141;
+}
+
+.layui-badge-dot {
+  margin-right: 5px;
+}
+
+#myMsg .layui-badge {
+  margin: -8px 0px 0;
+}
+
+.layui-table td {
+  padding: 3px 7px;
+}
+
+#projectDetailBox .layui-table td {
+  padding: 9px 15px;
+}
+
+#registBox .layui-form-checkbox[lay-skin="primary"] {
+  margin-top: 0px;
+}
+
+.ht-nav-item {
+  position: relative;
+  display: inline-block;
+  vertical-align: middle;
+  line-height: 60px;
+}
+
+.ht-nav-item a {
+  display: block;
+  color: rgba(255, 255, 255, 0.7);
+  padding: 0 10px;
+}
+
+.ht-nav-item:hover {
+  /* background: #777; */
+  color: #fff;
+}
+
+#implementationBox .layui-form-item .layui-form-checkbox[lay-skin="primary"] {
+  margin-top: 0px;
+}
+
+#providerBox .layui-form-item .layui-form-checkbox[lay-skin="primary"] {
+  margin-top: 0px;
+}
+
+/*���Ի�*/
+.individuation {
+  width: 249px;
+  border-left: 1px solid #ddd;
+  position: fixed;
+  bottom: 44px;
+  top: 60px;
+  left: 0;
+  background: rgba(255, 255, 255, 0.8);
+  z-index: 999;
+}
+
+.individuation > ul {
+  height: 45px;
+}
+
+.individuation > ul > li {
+  display: inline-block;
+  line-height: 45px;
+  padding: 0 10px;
+  background: rgba(242, 242, 242, 0.9);
+}
+
+.individuation > .explain {
+  padding: 20px;
+  background: rgba(242, 242, 242, 0.9);
+  text-align: center;
+}
+
+.individuation .setting-title {
+  background: #e2e2e2;
+  text-align: center;
+  text-transform: uppercase;
+  font-weight: 600;
+  display: block;
+  padding: 10px 15px;
+  font-size: 13px;
+}
+
+.individuation .setting-item {
+  padding: 10px 20px;
+  border-bottom: 1px solid #e7eaec;
+  background: #fff;
+}
+
+.individuation .setting-item:after {
+  content: "";
+  display: block;
+  height: 0;
+  clear: both;
+  visibility: hidden;
+}
+
+.individuation .setting-item span {
+  font-family: "open sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 13px;
+  color: #676a6c;
+  line-height: 21px;
+}
+
+/*��װLayui����*/
+.individuation .layui-form-switch {
+  margin: 0;
+  float: right;
+  height: 18px;
+  line-height: 18px;
+  border-radius: 0;
+}
+
+.individuation .layui-form-switch i {
+  top: 1px;
+  border-radius: 0;
+  left: 2px;
+}
+
+.individuation .layui-form-onswitch i {
+  /* left: 35px; */
+  left: 58px;
+}
+
+/*Ƥ������*/
+.individuation .skin,
+.individuation .skin span {
+  font-weight: 600;
+  text-align: center;
+  color: #fff;
+  border: none;
+  cursor: default;
+  padding: 15px 20px;
+}
+
+.individuation .skin:hover {
+  opacity: 0.7;
+}
+
+.individuation .skin-0 {
+  background: #23262e;
+}
+
+.individuation .skin-1 {
+  background: #2f4f8e;
+}
+
+.individuation .skin-2 {
+  background: #640b4a;
+}
+
+.individuation .skin-3 {
+  background: #8e430e;
+}
+
+.individuation .skin-4 {
+  background: #009688;
+}
+
+#individuation {
+  margin-left: 10px;
+  /* margin-top:23px; */
+}
+.skin span a {
+  color: #fff;
+}
+
+.setting-item {
+  cursor: pointer;
+}
+
+.xygl a,
+.xyzc a {
+  color: #1090ef;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.individuation .layui-nav-tree {
+  width: 100%;
+  overflow: auto;
+}
+
+#msg-p a {
+  text-decoration: underline;
+  cursor: pointer;
+}
+#msg-pc a {
+  text-decoration: underline;
+  cursor: pointer;
+}
+#allMsg a {
+  color: #1e9fff;
+  text-decoration: underline;
+}
+
+.layui-layout-admin .layui-logo {
+  position: relative;
+  width: 140px;
+  /* left: 0; */
+}
+.layui-logo img {
+  float: left;
+  margin-top: 10px;
+  height: 42px;
+}
+.layui-logo div {
+  height: 60px;
+  width: 160px;
+}
+.layui-logo div b {
+  font-size: 16px;
+  height: 30px;
+  line-height: 42px;
+  display: inline-block;
+  float: left;
+  margin-left: 15px;
+}
+.layui-logo div span {
+  font-size: 11px;
+  display: inline-block;
+  height: 20px;
+  line-height: 20px;
+  float: left;
+}
+
+.head_title {
+  position: relative;
+  /* left: 280px; */
+  left: 0;
+  top: 0;
+  width: 100px;
+  height: 100%;
+  line-height: 60px;
+  text-align: center;
+  color: #009688;
+  font-size: 16px;
+}
+
+/* ��Ļ���С��1100px��ʱ��͵���.head_title����߾� */
+@media screen and (max-width: 1100px) {
+  .head_title {
+    /* left:230px; */
+  }
+}
+
+/* ��Ļ���С��1000px��ʱ��Ͳ���ʾ���������� */
+@media screen and (max-width: 1000px) {
+  #helpBtn {
+    display: none;
+  }
+}
+
+/* ��Ļ���С��900px��ʱ��*/
+@media screen and (max-width: 900px) {
+}
+
+/* ��Ļ���С��800px��ʱ��Ͳ���ʾ��ҳ��ť��*/
+@media screen and (max-width: 800px) {
+  #mainBtn {
+    display: none;
+  }
+}
+
+.layui-header .layui-nav .layui-nav-item a:hover,
+.layui-nav .layui-this a {
+  color: #000 !important;
+}
+
+.layui-header .layui-nav .layui-nav-item a {
+  color: #000 !important;
+}
+
+.layui-layout-admin {
+  border-bottom: 1px solid #cdcdcd;
+}
+
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  /* position: absolute;
+    top: 0;
+    left: calc(50% - 650px); */
+  height: 100%;
+  max-width: 1300px;
+  width: 100%;
+  margin: 0 auto;
+  /* width: 1300px; */
+}
+
+.pro_name a {
+  color: #4183c4;
+}
+
+.osc_git_title {
+  background-color: #fff;
+}
+
+.osc_git_box {
+  background-color: #fff;
+}
+
+.osc_git_box {
+  border-color: #e3e9ed;
+}
+
+.osc_git_info {
+  color: #666;
+}
+
+.osc_git_main a {
+  color: #9b9b9b;
+}
+
+.slider-item {
+  top: -1px !important;
+}
+
+.slider-btn {
+  background-color: #ffffff !important;
+  color: #009688 !important;
+  box-shadow: 1px 4px 10px #909090;
+  filter: progid:DXImageTransform.Microsoft.Shadow(color=#909090, direction=120, strength=4);
+}
+
+.corp-name {
+  line-height: 60px;
+  margin-left: 160px;
+  color: #a19393;
+  font-size: 20px;
+}
+.login-corp-name {
+  line-height: 60px;
+  margin-left: -160px;
+  display: inline-block;
+  color: #a19393;
+  font-size: 20px;
+}
+
+.layui-layout-admin .layui-logo {
+  box-shadow: none;
+}

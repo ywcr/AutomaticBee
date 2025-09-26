@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>登录 - 精灵蜂 Electron版（原生）</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: #333;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+      }
+      .card {
+        width: 100%;
+        max-width: 520px;
+        background: #fff;
+        border-radius: 16px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+        padding: 28px 28px 24px;
+      }
+      .title {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 22px;
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 8px;
+      }
+      .subtitle {
+        text-align: center;
+        color: #6c757d;
+        font-size: 13px;
+        margin-bottom: 18px;
+      }
+      .form-group {
+        margin-bottom: 14px;
+      }
+      .label {
+        display: block;
+        margin-bottom: 6px;
+        color: #495057;
+        font-size: 13px;
+      }
+      .input {
+        width: 100%;
+        padding: 10px 12px;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        font-size: 14px;
+      }
+      .row {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+      }
+      .btn {
+        cursor: pointer;
+        border: none;
+        border-radius: 8px;
+        padding: 10px 14px;
+        font-size: 14px;
+      }
+      .btn-primary {
+        background: #e55304;
+        color: #fff;
+        width: 100%;
+        margin-top: 6px;
+      }
+      .btn-outline {
+        background: #f1f3f5;
+        color: #333;
+      }
+      .nc {
+        margin: 10px 0 6px;
+      }
+      .help {
+        font-size: 12px;
+        color: #868e96;
+        text-align: center;
+        margin-top: 10px;
+      }
+      .row-split {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .checkbox {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 13px;
+        color: #495057;
+      }
+      .error {
+        color: #d9534f;
+        font-size: 12px;
+        margin-top: 6px;
+      }
+      .hidden {
+        display: none;
+      }
+      .success {
+        color: #2e7d32;
+        font-size: 12px;
+        margin-top: 6px;
+      }
+    </style>
+    <!-- 阿里云滑块 -->
+    <script
+      src="https://g.alicdn.com/sd/ncpc/nc.js?t=2015052012"
+      charset="utf-8"
+    ></script>
+    <!-- 加密库（沿用原协议依赖） -->
+    <script src="lgb/js/util/crypto-js.min.js"></script>
+    <script src="lgb/js/md5.min.js"></script>
+    <style>
+      .nc-container .nc_scale span {
+        height: 34px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <div class="title">精灵蜂账号登录</div>
+      <div class="subtitle">完成滑块验证后登录，默认返回自动化工具页</div>
+
+      <div class="form-group">
+        <label class="label" for="phone">手机号</label>
+        <input
+          class="input"
+          id="phone"
+          type="tel"
+          placeholder="请输入11位手机号"
+          maxlength="11"
+        />
+        <div id="phoneError" class="error hidden">请输入正确的手机号</div>
+      </div>
+
+      <div id="loginCaptchaWrap" class="form-group hidden">
+        <label class="label" for="loginCaptcha">短信验证码</label>
+        <div class="row">
+          <input
+            class="input"
+            id="loginCaptcha"
+            type="text"
+            placeholder="请输入6位验证码"
+            maxlength="6"
+          />
+          <button class="btn btn-outline" id="getLoginCaptcha" type="button">
+            获取验证码
+          </button>
+        </div>
+        <div id="captchaHint" class="help">根据账号状态可能需要短信验证码</div>
+      </div>
+
+      <div class="form-group">
+        <label class="label" for="password">密码</label>
+        <input
+          class="input"
+          id="password"
+          type="password"
+          placeholder="请输入密码"
+        />
+        <div id="pwdError" class="error hidden">请输入密码</div>
+      </div>
+
+      <div class="form-group nc">
+        <div id="nc"></div>
+        <div id="ncError" class="error hidden">请先完成滑块验证</div>
+        <div id="ncOk" class="success hidden">滑块验证通过</div>
+      </div>
+
+      <div class="row-split">
+        <label class="checkbox">
+          <input type="checkbox" id="remember" /> 记住手机号和密码
+        </label>
+        <button class="btn btn-outline" id="resetBtn" type="button">
+          重置
+        </button>
+      </div>
+
+      <button class="btn btn-primary" id="loginBtn" type="button">登录</button>
+
+      <div class="help" id="msg"></div>
+    </div>
+
+    <script>
+      (function () {
+        // 状态
+        let slider = {
+          passed: false,
+          Sig: "",
+          Token: "",
+          csessionid: "",
+        };
+
+        const qs = new URLSearchParams(window.location.search);
+        const returnTo = (
+          qs.get("returnTo") || "automation-dashboard.html"
+        ).replace(/^\/+/, "");
+
+        // DOM
+        const $ = (id) => document.getElementById(id);
+        const phoneEl = $("phone");
+        const loginCaptchaWrap = $("loginCaptchaWrap");
+        const loginCaptchaEl = $("loginCaptcha");
+        const getLoginCaptchaBtn = $("getLoginCaptcha");
+        const pwdEl = $("password");
+        const rememberEl = $("remember");
+        const loginBtn = $("loginBtn");
+        const resetBtn = $("resetBtn");
+        const msgEl = $("msg");
+
+        const phoneError = $("phoneError");
+        const pwdError = $("pwdError");
+        const ncError = $("ncError");
+        const ncOk = $("ncOk");
+
+        function show(el) {
+          el.classList.remove("hidden");
+        }
+        function hide(el) {
+          el.classList.add("hidden");
+        }
+        function tip(text, type = "info") {
+          msgEl.textContent = text || "";
+          msgEl.style.color =
+            type === "error"
+              ? "#d9534f"
+              : type === "success"
+              ? "#2e7d32"
+              : "#495057";
+        }
+
+        function validatePhone(p) {
+          return /^1\d{10}$/.test(p || "");
+        }
+
+        // 自动填充
+        try {
+          const savedPhone = localStorage.getItem("phone") || "";
+          const savedPwd = localStorage.getItem("pwd") || "";
+          if (savedPhone) {
+            phoneEl.value = savedPhone;
+            pwdEl.value = savedPwd;
+            rememberEl.checked = true;
+          }
+        } catch {}
+
+        // 判断是否需要短信验证码
+        async function checkShowCaptcha() {
+          const phone = phoneEl.value.trim();
+          if (!validatePhone(phone)) {
+            loginCaptchaWrap.classList.add("hidden");
+            return;
+          }
+          try {
+            const res = await fetch(
+              `/lgb/user/showCaptcha?mobile=${encodeURIComponent(phone)}`
+            );
+            const data = await res.json();
+            if (data && data.code === 0 && data.data) {
+              loginCaptchaWrap.classList.remove("hidden");
+            } else {
+              loginCaptchaWrap.classList.add("hidden");
+            }
+          } catch (e) {
+            // 静默失败
+          }
+        }
+
+        phoneEl.addEventListener("input", checkShowCaptcha);
+
+        // 获取短信验证码（如有需要，接口按你的后端为准，这里仅示例占位）
+        getLoginCaptchaBtn.addEventListener("click", async () => {
+          const phone = phoneEl.value.trim();
+          if (!validatePhone(phone)) {
+            show(phoneError);
+            return;
+          } else {
+            hide(phoneError);
+          }
+          getLoginCaptchaBtn.disabled = true;
+          let left = 60;
+          getLoginCaptchaBtn.textContent = `${left}s`;
+          const timer = setInterval(() => {
+            left -= 1;
+            getLoginCaptchaBtn.textContent = `${left}s`;
+            if (left <= 0) {
+              clearInterval(timer);
+              getLoginCaptchaBtn.textContent = "获取验证码";
+              getLoginCaptchaBtn.disabled = false;
+            }
+          }, 1000);
+          // 如需真实发送，请调用后端接口：/lgb/user/sendLoginVerifyCode 之类
+        });
+
+        // 初始化滑块（优先使用 noCaptcha 与参考实现一致）
+        function initSlider() {
+          const appkey = "FFFF0N0000000000B194";
+          const nc_token = [appkey, Date.now(), Math.random()].join(":");
+
+          try {
+            const NC_Opt = {
+              renderTo: "#nc",
+              appkey,
+              scene: "nc_login",
+              token: nc_token,
+              customWidth: "300px",
+              language: "cn",
+              isEnabled: true,
+              timeout: 3000,
+              times: 5,
+              callback: function (data) {
+                // 兼容大小写
+                slider.Token = data.token || data.Token || '';
+                slider.csessionid = data.csessionid || data.csessionId || '';
+                slider.Sig = data.sig || data.Sig || '';
+                slider.passed = (data.value ? data.value === 'pass' : true) && !!slider.Token && !!slider.csessionid && !!slider.Sig;
+                if (slider.passed) {
+                  hide(ncError);
+                  show(ncOk);
+                  tip("滑块验证成功", "success");
+                } else {
+                  show(ncError);
+                }
+                console.log('[NC] callback:', { Token: slider.Token, csessionid: slider.csessionid, Sig: slider.Sig, passed: slider.passed });
+              }
+            };
+
+            if (window.noCaptcha) {
+              window.__nc = new window.noCaptcha(NC_Opt);
+            } else if (window.NoCaptcha) {
+              // 新版SDK适配
+              window.__nc = new window.NoCaptcha(Object.assign({}, NC_Opt, { width: 300, height: 40 }));
+            } else {
+              tip("滑块脚本未加载，请检查网络", "error");
+            }
+          } catch (e) {
+            tip("滑块初始化失败: " + e.message, "error");
+          }
+        }
+
+        // 提交登录
+        async function doLogin() {
+          tip("");
+          const phone = phoneEl.value.trim();
+          const pwd = pwdEl.value;
+          const loginCaptcha = loginCaptchaEl.value.trim();
+
+          // 简单校验
+          let ok = true;
+          if (!validatePhone(phone)) {
+            show(phoneError);
+            ok = false;
+          } else {
+            hide(phoneError);
+          }
+          if (!pwd) {
+            show(pwdError);
+            ok = false;
+          } else {
+            hide(pwdError);
+          }
+          if (!slider.passed) {
+            show(ncError);
+            ok = false;
+          } else {
+            hide(ncError);
+          }
+          if (!ok) return;
+
+          try {
+            // AES 加密
+            const secretKey = CryptoJS.enc.Utf8.parse("secret5973164820");
+            let iv = CryptoJS.lib.WordArray.random(16);
+            const ciphertext = CryptoJS.AES.encrypt(pwd, secretKey, {
+              iv,
+            }).toString();
+            iv = iv.toString();
+
+            const body = new URLSearchParams();
+            body.set("phone", phone);
+            body.set("pwd", ciphertext);
+            body.set("iv", iv);
+            if (loginCaptcha) body.set("loginCaptcha", loginCaptcha);
+            body.set("clientType", "jlf");
+            // 滑块参数
+            body.set("sig", slider.Sig);
+            body.set("token", slider.Token);
+            body.set("cssessionId", slider.csessionid);
+            body.set("appKey", "FFFF0N0000000000B194");
+            body.set("scene", "nc_login");
+
+            loginBtn.disabled = true;
+            loginBtn.textContent = "登录中...";
+            // 调试：打印关键参数是否存在（不打印明文）
+            try {
+              console.debug('[LOGIN] slider flags:', {
+                passed: !!slider.passed,
+                hasSig: !!slider.Sig,
+                hasToken: !!slider.Token,
+                hasCsessionId: !!slider.csessionid
+              });
+            } catch {}
+            const resp = await fetch("/lgb/user/login", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+                "X-Requested-With": "XMLHttpRequest"
+              },
+              credentials: "include",
+              body: body.toString(),
+            });
+            const data = await resp.json();
+
+            // 更稳健的成功判定：支持 code 0/"0"/200/"200"/"666"，或 success=true，或返回 token
+            const success = !!(data && (
+              data.code === 0 || data.code === "0" || data.code === 200 || data.code === "200" || data.code === "666" || data.success === true || data.token
+            ));
+
+            if (success) {
+              // 记录授权
+              try {
+                const tokenObj = { token: data.token };
+                if (tokenObj.token) {
+                  localStorage.setItem(
+                    "Authorization",
+                    encodeURIComponent(JSON.stringify(tokenObj))
+                  );
+                }
+                if (rememberEl.checked) {
+                  localStorage.setItem("phone", phone);
+                  localStorage.setItem("pwd", pwd);
+                } else {
+                  localStorage.removeItem("phone");
+                  localStorage.removeItem("pwd");
+                }
+              } catch {}
+
+              // 获取用户名并设置为当前活动标签标题（优先使用真实姓名/员工名）
+              try {
+                const respUser = await fetch('/lgb/user/getUserName', { method: 'POST' });
+                const user = await respUser.json();
+                const deriveName = (u) => {
+                  try {
+                    let name = u?.realName || u?.employeeName || u?.username || u?.nick || u?.name || '';
+                    if (!name && typeof u === 'string') return u;
+                    if (u?.identity === '需求企业' && u?.corpName) {
+                      name = name ? `${name}(${u.corpName})` : u.corpName;
+                    }
+                    return name || '已登录';
+                  } catch { return '已登录'; }
+                };
+                const displayName = deriveName(user || {});
+                if (window.electronAPI?.tabManager) {
+                  const active = await window.electronAPI.tabManager.getActiveTab();
+                  const tabId = active?.tab?.id || active?.id || active?.tabId;
+                  if (tabId) {
+                    await window.electronAPI.tabManager.setTabAccount(tabId, { username: displayName, user });
+                  }
+                }
+              } catch (e) {
+                try { console.debug('[LOGIN] 设置标签用户名失败:', e?.message || e); } catch {}
+              }
+
+              tip("登录成功，正在跳转...", "success");
+              // 跳转
+              window.location.assign("/" + returnTo + "?code=" + encodeURIComponent(data.code || "0"));
+              return;
+            }
+
+            const message =
+              data && data.message
+                ? String(data.message).replace(/<a.*?<\/a>/g, "")
+                : "登录失败";
+            tip(message, "error");
+            // 失败则重置滑块
+            try {
+              if (window.__nc && window.__nc.reset) {
+                window.__nc.reset();
+              } else {
+                // 如果 reset 失败，重新初始化滑块
+                setTimeout(() => {
+                  initSlider();
+                }, 500);
+              }
+            } catch (resetError) {
+              console.error('滑块重置失败:', resetError);
+              // 重新初始化滑块
+              setTimeout(() => {
+                initSlider();
+              }, 500);
+            }
+            slider.passed = false;
+            slider.Sig = '';
+            slider.Token = '';
+            slider.csessionid = '';
+            hide(ncOk);
+            show(ncError);
+          } catch (e) {
+            tip("请求失败: " + e.message, "error");
+          } finally {
+            loginBtn.disabled = false;
+            loginBtn.textContent = "登录";
+          }
+        }
+
+        // 自动认证跳过（仅当已登录且非从工具站进入时）
+        (async function autoAuth() {
+          try {
+            const auth = localStorage.getItem("Authorization");
+            if (!auth) return;
+            const resp = await fetch("/lgb/user/isAuthenticated", {
+              method: "POST",
+            });
+            const result = await resp.json();
+            if (result && (result.code === 0 || result.code === 200 || result.success === true)) {
+              // 获取用户名并设置为当前活动标签标题（与登录逻辑一致）
+              try {
+                const respUser = await fetch('/lgb/user/getUserName', { method: 'POST' });
+                const user = await respUser.json();
+                const deriveName = (u) => {
+                  try {
+                    let name = u?.realName || u?.employeeName || u?.username || u?.nick || u?.name || '';
+                    if (!name && typeof u === 'string') return u;
+                    if (u?.identity === '需求企业' && u?.corpName) {
+                      name = name ? `${name}(${u.corpName})` : u.corpName;
+                    }
+                    return name || '已登录';
+                  } catch { return '已登录'; }
+                };
+                const displayName = deriveName(user || {});
+                if (window.electronAPI?.tabManager) {
+                  const active = await window.electronAPI.tabManager.getActiveTab();
+                  const tabId = active?.tab?.id || active?.id || active?.tabId;
+                  if (tabId) {
+                    await window.electronAPI.tabManager.setTabAccount(tabId, { username: displayName, user });
+                  }
+                }
+              } catch {}
+
+              window.location.replace("/" + returnTo);
+            }
+          } catch {}
+        })();
+
+        // 事件
+        loginBtn.addEventListener("click", doLogin);
+        resetBtn.addEventListener("click", () => {
+          phoneEl.value = "";
+          pwdEl.value = "";
+          loginCaptchaEl.value = "";
+          hide(phoneError);
+          hide(pwdError);
+          hide(ncError);
+          hide(ncOk);
+          tip("已重置");
+          try {
+            window.__nc && window.__nc.reset && window.__nc.reset();
+            slider.passed = false;
+          } catch {}
+        });
+
+        // 初始化
+        checkShowCaptcha();
+        initSlider();
+      })();
+    </script>
+  </body>
+</html>

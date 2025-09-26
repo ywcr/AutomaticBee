@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>精灵蜂自动化任务管理平台</title>
+    <link rel="stylesheet" href="styles/automation-dashboard.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div id="app">
+        <!-- 顶部导航栏 -->
+        <header class="header">
+            <div class="header-left">
+                <h1><i class="fas fa-robot"></i> 精灵蜂自动化平台</h1>
+            </div>
+            <div class="header-right">
+                <div class="user-info">
+                    <span id="current-user">未登录</span>
+                    <div class="auth-buttons">
+                        <button id="login-btn" class="btn btn-primary btn-sm">
+                            <i class="fas fa-sign-in-alt"></i> 登录
+                        </button>
+                        <button id="logout-btn" class="btn btn-danger btn-sm" style="display: none;">
+                            <i class="fas fa-sign-out-alt"></i> 登出
+                        </button>
+                        <button id="switch-account-btn" class="btn btn-secondary btn-sm" style="display: none;">
+                            <i class="fas fa-user-cog"></i> 切换账号
+                        </button>
+                        <button id="refresh-auth" class="btn btn-sm" style="display: none;">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="connection-status">
+                    <span id="connection-indicator" class="status-indicator offline">
+                        <i class="fas fa-circle"></i>
+                    </span>
+                    <span id="connection-text">离线</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- 标签栏 -->
+        <div id="tab-bar" class="tab-bar" style="display: none;">
+            <div class="tab-list" id="tab-list">
+                <!-- 动态添加标签项 -->
+            </div>
+            <button class="tab-new" id="tab-new-btn" title="新建标签">
+                <i class="fas fa-plus"></i>
+            </button>
+        </div>
+
+        <!-- 主要内容区域 -->
+        <main class="main-content">
+            <!-- 侧边栏 -->
+            <aside class="sidebar">
+                <nav class="nav-menu">
+                    <ul>
+                        <li class="nav-item active" data-tab="dashboard">
+                            <i class="fas fa-tachometer-alt"></i>
+                            <span>仪表板</span>
+                        </li>
+                        <li class="nav-item" data-tab="data-import">
+                            <i class="fas fa-file-upload"></i>
+                            <span>数据导入</span>
+                        </li>
+                        <li class="nav-item" data-tab="task-management">
+                            <i class="fas fa-tasks"></i>
+                            <span>任务管理</span>
+                        </li>
+                        <li class="nav-item" data-tab="contacts">
+                            <i class="fas fa-users"></i>
+                            <span>联系人管理</span>
+                        </li>
+                        <li class="nav-item" data-tab="channels">
+                            <i class="fas fa-building"></i>
+                            <span>渠道管理</span>
+                        </li>
+                        <li class="nav-item" data-tab="tasks">
+                            <i class="fas fa-clipboard-list"></i>
+                            <span>任务管理</span>
+                        </li>
+                        <li class="nav-item" data-tab="validation">
+                            <i class="fas fa-check-circle"></i>
+                            <span>数据验证</span>
+                        </li>
+                        <li class="nav-item" data-tab="queue">
+                            <i class="fas fa-list-ol"></i>
+                            <span>任务队列</span>
+                        </li>
+                        <li class="nav-item" data-tab="logs">
+                            <i class="fas fa-file-alt"></i>
+                            <span>日志管理</span>
+                        </li>
+                        <li class="nav-item" data-tab="settings">
+                            <i class="fas fa-cog"></i>
+                            <span>系统设置</span>
+                        </li>
+                    </ul>
+                </nav>
+            </aside>
+
+            <!-- 内容区域 -->
+            <div class="content-area">
+                <!-- 仪表板 -->
+                <section id="dashboard" class="tab-content active">
+                    <div class="dashboard-header">
+                        <h2>系统概览</h2>
+                        <div class="quick-actions">
+                            <button class="btn btn-primary" id="quick-import">
+                                <i class="fas fa-plus"></i> 快速导入
+                            </button>
+                            <button class="btn btn-success" id="quick-validate">
+                                <i class="fas fa-check"></i> 快速验证
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-database"></i>
+                            </div>
+                            <div class="stat-content">
+                                <h3 id="total-records">0</h3>
+                                <p>总数据量</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <div class="stat-content">
+                                <h3 id="pending-tasks">0</h3>
+                                <p>待处理任务</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                            <div class="stat-content">
+                                <h3 id="completed-tasks">0</h3>
+                                <p>已完成任务</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-exclamation-triangle"></i>
+                            </div>
+                            <div class="stat-content">
+                                <h3 id="failed-tasks">0</h3>
+                                <p>失败任务</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-widgets">
+                        <div class="widget">
+                            <h3>最近活动</h3>
+                            <div id="recent-activities" class="activity-list">
+                                <!-- 动态加载活动列表 -->
+                            </div>
+                        </div>
+                        <div class="widget">
+                            <h3>系统状态</h3>
+                            <div id="system-status" class="status-list">
+                                <!-- 动态加载系统状态 -->
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 数据导入 -->
+                <section id="data-import" class="tab-content">
+                    <div class="section-header">
+                        <h2>数据导入与处理</h2>
+                    </div>
+
+                    <div class="import-steps">
+                        <div class="step-card">
+                            <div class="step-number">1</div>
+                            <div class="step-content">
+                                <h3>选择问卷类型</h3>
+                                <select id="questionnaire-type" class="form-control">
+                                    <option value="">请选择问卷类型</option>
+                                    <option value="liuwei_patient">六味患者问卷</option>
+                                    <option value="xihuang_consumer">西黄消费者问卷</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="step-card">
+                            <div class="step-number">2</div>
+                            <div class="step-content">
+                                <h3>选择项目</h3>
+                                <button id="refresh-projects" class="btn btn-secondary" disabled>
+                                    <i class="fas fa-sync-alt"></i> 刷新项目列表
+                                </button>
+                                <div id="project-list" class="project-list">
+                                    <!-- 动态加载项目列表 -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="step-card">
+                            <div class="step-number">3</div>
+                            <div class="step-content">
+                                <h3>上传 Excel 文件</h3>
+                                <div class="file-upload-area" id="file-upload-area">
+                                    <i class="fas fa-cloud-upload-alt"></i>
+                                    <p>拖拽文件到此处或点击选择文件</p>
+                                    <input type="file" id="excel-file" accept=".xlsx,.xls" hidden>
+                                    <button class="btn btn-primary" onclick="document.getElementById('excel-file').click()">
+                                        选择文件
+                                    </button>
+                                </div>
+                                <div id="upload-status" class="upload-status"></div>
+                            </div>
+                        </div>
+
+                        <div class="step-card">
+                            <div class="step-number">4</div>
+                            <div class="step-content">
+                                <h3>数据预览与过滤</h3>
+                                <div class="date-filter">
+                                    <label>日期范围：</label>
+                                    <input type="date" id="start-date" class="form-control">
+                                    <span>至</span>
+                                    <input type="date" id="end-date" class="form-control">
+                                    <button id="apply-filter" class="btn btn-primary">应用过滤</button>
+                                </div>
+                                <div id="data-preview" class="data-preview">
+                                    <!-- 动态加载数据预览 -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 联系人管理 -->
+                <section id="contacts" class="tab-content">
+                    <div class="section-header">
+                        <h2>联系人管理</h2>
+                        <div class="section-actions">
+                            <button id="add-contact" class="btn btn-primary">
+                                <i class="fas fa-plus"></i> 新增联系人
+                            </button>
+                            <button id="import-contacts" class="btn btn-info">
+                                <i class="fas fa-upload"></i> 批量导入
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="search-section">
+                        <div class="search-form">
+                            <input type="text" id="contact-search" placeholder="搜索联系人姓名...">
+                            <select id="contact-type-filter">
+                                <option value="">全部类型</option>
+                                <option value="患者">患者</option>
+                                <option value="消费者">消费者</option>
+                                <option value="医生">医生</option>
+                            </select>
+                            <button id="search-contacts" class="btn btn-secondary">
+                                <i class="fas fa-search"></i> 搜索
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="data-table-container">
+                        <table class="data-table" id="contacts-table">
+                            <thead>
+                                <tr>
+                                    <th>姓名</th>
+                                    <th>性别</th>
+                                    <th>类型</th>
+                                    <th>指派人</th>
+                                    <th>联系方式</th>
+                                    <th>创建时间</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="contacts-tbody">
+                                <!-- 动态加载联系人数据 -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="pagination" id="contacts-pagination">
+                        <div class="pagination-info">
+                            <span id="contacts-pagination-info">显示 1-20 条，共 0 条记录</span>
+                        </div>
+                        <div class="pagination-controls">
+                            <button class="pagination-btn" id="contacts-first-page" disabled>
+                                <i class="fas fa-angle-double-left"></i>
+                            </button>
+                            <button class="pagination-btn" id="contacts-prev-page" disabled>
+                                <i class="fas fa-angle-left"></i>
+                            </button>
+                            <div class="pagination-pages" id="contacts-pagination-pages">
+                                <button class="pagination-btn active">1</button>
+                            </div>
+                            <button class="pagination-btn" id="contacts-next-page" disabled>
+                                <i class="fas fa-angle-right"></i>
+                            </button>
+                            <button class="pagination-btn" id="contacts-last-page" disabled>
+                                <i class="fas fa-angle-double-right"></i>
+                            </button>
+                        </div>
+                        <div class="pagination-size">
+                            <select id="contacts-page-size">
+                                <option value="10">10条/页</option>
+                                <option value="20" selected>20条/页</option>
+                                <option value="50">50条/页</option>
+                                <option value="100">100条/页</option>
+                            </select>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 渠道管理 -->
+                <section id="channels" class="tab-content">
+                    <div class="section-header">
+                        <h2>渠道管理</h2>
+                        <div class="section-actions">
+                            <button id="add-channel" class="btn btn-primary">
+                                <i class="fas fa-plus"></i> 新增渠道
+                            </button>
+                            <button id="import-channels" class="btn btn-info">
+                                <i class="fas fa-upload"></i> 批量导入
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="search-section">
+                        <div class="search-form">
+                            <input type="text" id="channel-search" placeholder="搜索渠道名称...">
+                            <select id="channel-type-filter">
+                                <option value="">全部类型</option>
+                                <option value="零售渠道档案">零售渠道档案</option>
+                                <option value="等级医院档案">等级医院档案</option>
+                                <option value="基层医疗档案">基层医疗档案</option>
+                                <option value="竞品渠道档案">竞品渠道档案</option>
+                            </select>
+                            <button id="search-channels" class="btn btn-secondary">
+                                <i class="fas fa-search"></i> 搜索
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="data-table-container">
+                        <table class="data-table" id="channels-table">
+                            <thead>
+                                <tr>
+                                    <th>渠道名称</th>
+                                    <th>渠道类型</th>
+                                    <th>地址</th>
+                                    <th>区域代码</th>
+                                    <th>状态</th>
+                                    <th>创建时间</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="channels-tbody">
+                                <!-- 动态加载渠道数据 -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="pagination" id="channels-pagination">
+                        <div class="pagination-info">
+                            <span id="channels-pagination-info">显示 1-20 条，共 0 条记录</span>
+                        </div>
+                        <div class="pagination-controls">
+                            <button class="pagination-btn" id="channels-first-page" disabled>
+                                <i class="fas fa-angle-double-left"></i>
+                            </button>
+                            <button class="pagination-btn" id="channels-prev-page" disabled>
+                                <i class="fas fa-angle-left"></i>
+                            </button>
+                            <div class="pagination-pages" id="channels-pagination-pages">
+                                <button class="pagination-btn active">1</button>
+                            </div>
+                            <button class="pagination-btn" id="channels-next-page" disabled>
+                                <i class="fas fa-angle-right"></i>
+                            </button>
+                            <button class="pagination-btn" id="channels-last-page" disabled>
+                                <i class="fas fa-angle-double-right"></i>
+                            </button>
+                        </div>
+                        <div class="pagination-size">
+                            <select id="channels-page-size">
+                                <option value="10">10条/页</option>
+                                <option value="20" selected>20条/页</option>
+                                <option value="50">50条/页</option>
+                                <option value="100">100条/页</option>
+                            </select>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 任务管理 -->
+                <section id="tasks" class="tab-content">
+                    <div class="section-header">
+                        <h2>任务管理</h2>
+                        <div class="section-actions">
+                            <button id="create-task" class="btn btn-primary">
+                                <i class="fas fa-plus"></i> 创建任务
+                            </button>
+                            <button id="refresh-tasks" class="btn btn-secondary">
+                                <i class="fas fa-sync-alt"></i> 刷新
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="search-section">
+                        <div class="search-form">
+                            <input type="text" id="task-search" placeholder="搜索任务标题...">
+                            <select id="task-status-filter">
+                                <option value="">全部状态</option>
+                                <option value="可实施">可实施</option>
+                                <option value="进行中">进行中</option>
+                                <option value="已完成">已完成</option>
+                                <option value="已暂停">已暂停</option>
+                            </select>
+                            <select id="task-type-filter">
+                                <option value="">全部类型</option>
+                                <option value="患者问卷">患者问卷</option>
+                                <option value="消费者问卷">消费者问卷</option>
+                            </select>
+                            <button id="search-tasks" class="btn btn-secondary">
+                                <i class="fas fa-search"></i> 搜索
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="data-table-container">
+                        <table class="data-table" id="tasks-table">
+                            <thead>
+                                <tr>
+                                    <th>任务标题</th>
+                                    <th>任务类型</th>
+                                    <th>项目区域</th>
+                                    <th>状态</th>
+                                    <th>截止时间</th>
+                                    <th>创建时间</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tasks-tbody">
+                                <!-- 动态加载任务数据 -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="pagination" id="tasks-pagination">
+                        <div class="pagination-info">
+                            <span id="tasks-pagination-info">显示 1-20 条，共 0 条记录</span>
+                        </div>
+                        <div class="pagination-controls">
+                            <button class="pagination-btn" id="tasks-first-page" disabled>
+                                <i class="fas fa-angle-double-left"></i>
+                            </button>
+                            <button class="pagination-btn" id="tasks-prev-page" disabled>
+                                <i class="fas fa-angle-left"></i>
+                            </button>
+                            <div class="pagination-pages" id="tasks-pagination-pages">
+                                <button class="pagination-btn active">1</button>
+                            </div>
+                            <button class="pagination-btn" id="tasks-next-page" disabled>
+                                <i class="fas fa-angle-right"></i>
+                            </button>
+                            <button class="pagination-btn" id="tasks-last-page" disabled>
+                                <i class="fas fa-angle-double-right"></i>
+                            </button>
+                        </div>
+                        <div class="pagination-size">
+                            <select id="tasks-page-size">
+                                <option value="10">10条/页</option>
+                                <option value="20" selected>20条/页</option>
+                                <option value="50">50条/页</option>
+                                <option value="100">100条/页</option>
+                            </select>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 自动化任务管理 -->
+                <section id="task-management" class="tab-content">
+                    <div class="section-header">
+                        <h2>任务管理</h2>
+                        <div class="task-controls">
+                            <button id="open-automation-tasks" class="btn btn-primary">
+                                <i class="fas fa-external-link-alt"></i> 打开自动化任务页面
+                            </button>
+                            <button id="create-contacts-task" class="btn btn-info" disabled>
+                                <i class="fas fa-user-plus"></i> 创建联系人
+                            </button>
+                            <button id="create-questionnaires-task" class="btn btn-warning" disabled>
+                                <i class="fas fa-file-alt"></i> 创建问卷
+                            </button>
+                            <button id="create-tasks-task" class="btn btn-info" disabled>
+                                <i class="fas fa-tasks"></i> 创建任务
+                            </button>
+                            <button id="create-all-task" class="btn btn-success" disabled>
+                                <i class="fas fa-play"></i> 全部创建
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="assignee-management">
+                        <h3>指派人管理</h3>
+                        <div id="assignee-list" class="assignee-grid">
+                            <!-- 动态加载指派人列表 -->
+                        </div>
+                    </div>
+
+                    <div class="execution-progress-section" style="display: none;" id="execution-progress-section">
+                        <h3>执行进度</h3>
+                        <div class="progress-container">
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="execution-progress" style="width: 0%;">0%</div>
+                            </div>
+                            <div class="progress-status" id="execution-status">准备中...</div>
+                        </div>
+                    </div>
+
+                    <div class="execution-controls">
+                        <h3>执行控制</h3>
+                        <div class="control-panel">
+                            <button id="pause-execution" class="btn btn-warning" disabled>
+                                <i class="fas fa-pause"></i> 暂停
+                            </button>
+                            <button id="resume-execution" class="btn btn-success" disabled>
+                                <i class="fas fa-play"></i> 继续
+                            </button>
+                            <button id="stop-execution" class="btn btn-danger" disabled>
+                                <i class="fas fa-stop"></i> 停止
+                            </button>
+                        </div>
+                        <div class="execution-settings">
+                            <label>并发数：</label>
+                            <input type="number" id="concurrency" min="1" max="5" value="1" class="form-control">
+                            <label>步骤延迟（毫秒）：</label>
+                            <input type="number" id="step-delay" min="500" max="10000" value="1500" class="form-control">
+                        </div>
+                    </div>
+
+                    <div class="progress-monitor">
+                        <h3>执行进度</h3>
+                        <div id="progress-container" class="progress-container">
+                            <div class="progress-bar">
+                                <div id="progress-fill" class="progress-fill"></div>
+                            </div>
+                            <div id="progress-text" class="progress-text">0/0</div>
+                        </div>
+                        <div id="current-task-info" class="current-task-info">
+                            <!-- 当前任务信息 -->
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 数据验证 -->
+                <section id="validation" class="tab-content">
+                    <div class="section-header">
+                        <h2>数据验证</h2>
+                    </div>
+
+                    <div class="validation-tools">
+                        <div class="validation-controls">
+                            <div class="form-group">
+                                <label>验证日期：</label>
+                                <input type="date" id="validation-date" class="form-control">
+                                <button id="validate-single-date" class="btn btn-primary">验证单日</button>
+                            </div>
+                            <div class="form-group">
+                                <label>批量验证：</label>
+                                <input type="date" id="batch-start-date" class="form-control">
+                                <span>至</span>
+                                <input type="date" id="batch-end-date" class="form-control">
+                                <button id="validate-date-range" class="btn btn-primary">批量验证</button>
+                            </div>
+                        </div>
+
+                        <div class="validation-results">
+                            <h3>验证结果</h3>
+                            <div id="validation-summary" class="validation-summary">
+                                <!-- 验证摘要 -->
+                            </div>
+                            <div id="validation-details" class="validation-details">
+                                <!-- 验证详情 -->
+                            </div>
+                        </div>
+
+                        <div class="retry-tools">
+                            <h3>补漏工具</h3>
+                            <div class="retry-controls">
+                                <button id="auto-retry-missing" class="btn btn-warning" disabled>
+                                    <i class="fas fa-redo"></i> 自动补漏
+                                </button>
+                                <button id="export-missing-csv" class="btn btn-info" disabled>
+                                    <i class="fas fa-download"></i> 导出遗漏名单
+                                </button>
+                                <button id="export-validation-report" class="btn btn-secondary" disabled>
+                                    <i class="fas fa-file-export"></i> 导出验证报告
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 任务队列 -->
+                <section id="queue" class="tab-content">
+                    <div class="section-header">
+                        <h2>任务队列</h2>
+                        <div class="queue-controls">
+                            <button id="clear-completed" class="btn btn-secondary">
+                                <i class="fas fa-trash"></i> 清空已完成
+                            </button>
+                            <button id="clear-failed" class="btn btn-warning">
+                                <i class="fas fa-exclamation-triangle"></i> 清空失败
+                            </button>
+                            <button id="clear-all-queue" class="btn btn-danger">
+                                <i class="fas fa-trash-alt"></i> 清空队列
+                            </button>
+                        </div>
+                    </div>
+
+<div class="queue-stats">
+                        <div class="stat-item">
+                            <span class="stat-label">并发数：</span>
+                            <input type="number" id="queue-concurrency-input" class="form-control" style="width:80px;display:inline-block;" min="1" max="10" value="1" />
+                            <button id="queue-concurrency-apply" class="btn btn-sm btn-primary" style="margin-left:8px;">应用</button>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">待处理：</span>
+                            <span id="queue-pending" class="stat-value">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">运行中：</span>
+                            <span id="queue-running" class="stat-value">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">已完成：</span>
+                            <span id="queue-completed" class="stat-value">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">失败：</span>
+                            <span id="queue-failed" class="stat-value">0</span>
+                        </div>
+                    </div>
+
+                    <div class="queue-tabs">
+                        <button class="queue-tab active" data-queue-tab="pending">待处理</button>
+                        <button class="queue-tab" data-queue-tab="running">运行中</button>
+                        <button class="queue-tab" data-queue-tab="completed">已完成</button>
+                        <button class="queue-tab" data-queue-tab="failed">失败</button>
+                    </div>
+
+                    <div class="queue-content">
+                        <div id="queue-list" class="queue-list">
+                            <!-- 动态加载队列任务 -->
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 日志管理 -->
+                <section id="logs" class="tab-content">
+                    <div class="section-header">
+                        <h2>日志管理</h2>
+                        <div class="log-controls">
+                            <select id="log-level-filter" class="form-control">
+                                <option value="">所有级别</option>
+                                <option value="error">错误</option>
+                                <option value="warn">警告</option>
+                                <option value="info">信息</option>
+                                <option value="debug">调试</option>
+                            </select>
+                            <button id="clear-logs" class="btn btn-warning">
+                                <i class="fas fa-trash"></i> 清空日志
+                            </button>
+                            <button id="export-logs" class="btn btn-info">
+                                <i class="fas fa-download"></i> 导出日志
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="log-container">
+                        <div id="log-list" class="log-list">
+                            <!-- 动态加载日志 -->
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 系统设置 -->
+                <section id="settings" class="tab-content">
+                    <div class="section-header">
+                        <h2>系统设置</h2>
+                    </div>
+
+                    <div class="settings-tabs">
+                        <button class="settings-tab active" data-settings-tab="general">常规设置</button>
+                        <button class="settings-tab" data-settings-tab="api">API 配置</button>
+                        <button class="settings-tab" data-settings-tab="execution">执行配置</button>
+                        <button class="settings-tab" data-settings-tab="advanced">高级设置</button>
+                    </div>
+
+                    <div class="settings-content">
+                        <!-- 设置内容将通过 JavaScript 动态加载 -->
+                    </div>
+                </section>
+            </div>
+        </main>
+
+        <!-- 状态栏 -->
+        <footer class="status-bar">
+            <div class="status-left">
+                <span id="status-message">就绪</span>
+            </div>
+            <div class="status-right">
+                <span id="memory-usage">内存: 0MB</span>
+                <span id="version-info">v1.0.0</span>
+            </div>
+        </footer>
+    </div>
+
+    <!-- 模态框 -->
+    <div id="modal-overlay" class="modal-overlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="modal-title">标题</h3>
+                <button id="modal-close" class="modal-close">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body" id="modal-body">
+                <!-- 模态框内容 -->
+            </div>
+            <div class="modal-footer" id="modal-footer">
+                <!-- 模态框按钮 -->
+            </div>
+        </div>
+    </div>
+
+    <!-- 通知容器 -->
+    <div id="notification-container" class="notification-container">
+        <!-- 动态添加通知 -->
+    </div>
+
+    <!-- 加载指示器 -->
+    <div id="loading-overlay" class="loading-overlay" style="display: none;">
+        <div class="loading-content">
+            <div class="loading-spinner">
+                <i class="fas fa-spinner fa-spin"></i>
+            </div>
+            <p id="loading-text">正在加载...</p>
+        </div>
+    </div>
+
+    <!-- 脚本文件 -->
+    <script src="scripts/automation-dashboard.js"></script>
+    <script>
+        // 初始化dashboard
+        document.addEventListener('DOMContentLoaded', () => {
+            window.dashboard = new AutomationDashboard();
+        });
+        
+        // 添加 UUID 生成函数
+        if (typeof require !== 'undefined') {
+            const { v4: uuidv4 } = require('uuid');
+            window.uuidv4 = uuidv4;
+        } else {
+            // 简单的 UUID 生成函数作为后备
+            window.uuidv4 = function() {
+                return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                    var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+                    return v.toString(16);
+                });
+            };
+        }
+    </script>
+</body>
+</html>

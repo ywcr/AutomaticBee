@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>工具集合站 - Electron版</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .account-manager {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .account-item {
+            padding: 0.3rem 0.8rem;
+            background: #f8f9fa;
+            border-radius: 20px;
+            border: 1px solid #dee2e6;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.85rem;
+        }
+
+        .account-item.active {
+            background: #007bff;
+            color: white;
+            border-color: #007bff;
+        }
+
+        .account-item:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .tool-card {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .tool-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+        }
+
+        .tool-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: #007bff;
+        }
+
+        .tool-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #2c3e50;
+        }
+
+        .tool-description {
+            color: #6c757d;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+
+        .tool-features {
+            list-style: none;
+            margin-bottom: 1.5rem;
+        }
+
+        .tool-features li {
+            padding: 0.3rem 0;
+            color: #495057;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .tool-features li:before {
+            content: "✓";
+            color: #28a745;
+            font-weight: bold;
+        }
+
+        .tool-status {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .status-badge {
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .status-ready {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-beta {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-planned {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .title {
+            text-align: center;
+            color: white;
+            margin-bottom: 1rem;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: rgba(255,255,255,0.8);
+            font-size: 1.1rem;
+        }
+        
+        /* 新增的modal样式 */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+        
+        .modal-overlay.show {
+            display: flex;
+        }
+        
+        .modal {
+            background: white;
+            border-radius: 12px;
+            padding: 0;
+            width: 90%;
+            max-width: 600px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            position: relative;
+        }
+        
+        .modal-header {
+            padding: 2rem 2rem 1rem;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .modal-header h3 {
+            margin: 0;
+            color: #333;
+            font-size: 1.3rem;
+        }
+        
+        .modal-body {
+            padding: 2rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo">
+            <i class="fas fa-tools"></i>
+            工具集合站
+        </div>
+        <div class="user-info">
+            <div class="account-manager">
+                <span>当前账号:</span>
+                <div id="account-list">
+                    <!-- 动态加载账号列表 -->
+                </div>
+                <button class="btn btn-secondary" id="add-account">
+                    <i class="fas fa-plus"></i> 添加账号
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <h1 class="title">欢迎使用工具集合站</h1>
+        <p class="subtitle">选择您需要的工具开始工作</p>
+
+        <div class="tools-grid">
+            <!-- 精灵蜂自动化工具 -->
+            <div class="tool-card" data-tool="jingling-automation">
+                <div class="tool-icon">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <div class="tool-title">精灵蜂任务自动化</div>
+                <div class="tool-description">
+                    自动化创建联系人、渠道和问卷任务，支持Excel批量导入和多账号管理。
+                </div>
+                <ul class="tool-features">
+                    <li>Excel文件解析</li>
+                    <li>联系人自动创建</li>
+                    <li>问卷任务批量生成</li>
+                    <li>多账号并行处理</li>
+                    <li>后台队列执行</li>
+                </ul>
+                <div class="tool-status">
+                    <span class="status-badge status-ready">已就绪</span>
+                    <button class="btn btn-primary">启动工具</button>
+                </div>
+            </div>
+
+            <!-- 竞品问卷工具（计划中） -->
+            <div class="tool-card" data-tool="competitor-survey">
+                <div class="tool-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <div class="tool-title">竞品问卷分析</div>
+                <div class="tool-description">
+                    自动分析竞品问卷数据，生成对比报告和趋势分析。
+                </div>
+                <ul class="tool-features">
+                    <li>竞品数据采集</li>
+                    <li>问卷结构分析</li>
+                    <li>趋势对比报告</li>
+                    <li>数据可视化</li>
+                </ul>
+                <div class="tool-status">
+                    <span class="status-badge status-planned">开发计划中</span>
+                    <button class="btn btn-secondary" disabled>即将推出</button>
+                </div>
+            </div>
+
+            <!-- 数据处理工具（Beta） -->
+            <div class="tool-card" data-tool="data-processor">
+                <div class="tool-icon">
+                    <i class="fas fa-database"></i>
+                </div>
+                <div class="tool-title">数据处理助手</div>
+                <div class="tool-description">
+                    通用数据清洗、转换和分析工具，支持多种格式的数据处理。
+                </div>
+                <ul class="tool-features">
+                    <li>多格式数据导入</li>
+                    <li>数据清洗和验证</li>
+                    <li>格式转换</li>
+                    <li>批量处理</li>
+                </ul>
+                <div class="tool-status">
+                    <span class="status-badge status-beta">测试版</span>
+                    <button class="btn btn-secondary">试用版本</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class ToolsHome {
+            constructor() {
+                this.currentAccounts = [];
+                this.activeAccount = null;
+                this.init();
+            }
+
+            init() {
+                this.loadAccounts();
+                this.bindEvents();
+            }
+
+            loadAccounts() {
+                // 从localStorage加载已登录的账号
+                const accounts = JSON.parse(localStorage.getItem('loginAccounts') || '[]');
+                this.currentAccounts = accounts;
+                this.renderAccountList();
+            }
+
+            renderAccountList() {
+                const accountList = document.getElementById('account-list');
+                if (this.currentAccounts.length === 0) {
+                    accountList.innerHTML = '<span style="color: #6c757d;">未登录</span>';
+                    return;
+                }
+
+                accountList.innerHTML = this.currentAccounts.map((account, index) => `
+                    <div class="account-item ${account.active ? 'active' : ''}" 
+                         data-account-id="${account.id}">
+                        ${account.phone || account.username || `账号${index + 1}`}
+                        <i class="fas fa-times" onclick="removeAccount('${account.id}')" 
+                           style="margin-left: 0.5rem; cursor: pointer;"></i>
+                    </div>
+                `).join('');
+            }
+
+            bindEvents() {
+                // 工具卡片点击事件
+                document.querySelectorAll('.tool-card').forEach(card => {
+                    card.addEventListener('click', (e) => {
+                        if (!e.target.closest('button:disabled')) {
+                            const tool = card.dataset.tool;
+                            this.launchTool(tool);
+                        }
+                    });
+                });
+
+                // 添加账号按钮
+                document.getElementById('add-account').addEventListener('click', () => {
+                    this.addAccount();
+                });
+
+                // 账号切换
+                document.addEventListener('click', (e) => {
+                    if (e.target.classList.contains('account-item')) {
+                        this.switchAccount(e.target.dataset.accountId);
+                    }
+                });
+            }
+
+            launchTool(toolName) {
+                console.log(`启动工具: ${toolName}`);
+                
+                switch(toolName) {
+                    case 'jingling-automation':
+                        // 检查是否有活跃账号
+                        if (this.currentAccounts.length === 0) {
+                            alert('请先登录账号后再使用工具');
+                            this.addAccount();
+                            return;
+                        }
+                        
+                        // 检查是否支持多窗口（Electron环境）
+                        if (window.electronAPI && window.electronAPI.windowManager) {
+                            // 显示选择对话框
+                            this.showWindowChoice();
+                        } else {
+                            // 普通浏览器环境，直接跳转
+                            window.location.href = 'automation-dashboard.html';
+                        }
+                        break;
+                        
+                    case 'competitor-survey':
+                        alert('竞品问卷分析工具正在开发中，敬请期待！');
+                        break;
+                        
+                    case 'data-processor':
+                        alert('数据处理助手测试版即将推出！');
+                        break;
+                        
+                    default:
+                        alert('未知工具');
+                }
+            }
+
+            addAccount() {
+                // 跳转到登录页面
+                window.location.href = 'login.html?returnTo=tools-home.html';
+            }
+
+            switchAccount(accountId) {
+                // 切换活跃账号
+                this.currentAccounts.forEach(account => {
+                    account.active = account.id === accountId;
+                });
+                
+                localStorage.setItem('loginAccounts', JSON.stringify(this.currentAccounts));
+                this.renderAccountList();
+                
+                console.log(`切换到账号: ${accountId}`);
+            }
+
+            removeAccount(accountId) {
+                if (confirm('确定要移除这个账号吗？')) {
+                    this.currentAccounts = this.currentAccounts.filter(account => account.id !== accountId);
+                    localStorage.setItem('loginAccounts', JSON.stringify(this.currentAccounts));
+                    this.renderAccountList();
+                }
+            },
+            
+            // 显示窗口选择对话框
+            showWindowChoice() {
+                const modal = document.createElement('div');
+                modal.className = 'modal-overlay show';
+                modal.innerHTML = `
+                    <div class="modal" style="max-width: 500px;">
+                        <div class="modal-header">
+                            <h3>选择打开方式</h3>
+                            <button class="modal-close" onclick="this.closest('.modal-overlay').remove()">&times;</button>
+                        </div>
+                        <div class="modal-body">
+                            <p style="margin-bottom: 20px;">你想如何打开精灵蜂自动化工具？</p>
+                            <div style="display: flex; flex-direction: column; gap: 15px;">
+                                <button class="btn btn-primary" style="padding: 15px; font-size: 16px;" onclick="toolsHome.openInCurrentWindow()">
+                                    <i class="fas fa-arrow-right"></i> 在当前窗口中打开
+                                </button>
+                                <button class="btn btn-success" style="padding: 15px; font-size: 16px;" onclick="toolsHome.openInNewWindow()">
+                                    <i class="fas fa-plus"></i> 在新窗口中打开
+                                </button>
+                            </div>
+                            <div style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 6px;">
+                                <p style="margin: 0; font-size: 14px; color: #666;">
+                                    <i class="fas fa-info-circle"></i> 
+                                    新窗口模式允许你同时使用多个不同的账号，每个窗口独立运行。
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(modal);
+            },
+            
+            // 在当前窗口打开
+            openInCurrentWindow() {
+                const modal = document.querySelector('.modal-overlay');
+                if (modal) modal.remove();
+                window.location.href = 'automation-dashboard.html';
+            },
+            
+            // 在新窗口打开
+            async openInNewWindow() {
+                try {
+                    const modal = document.querySelector('.modal-overlay');
+                    if (modal) modal.remove();
+                    
+                    if (window.electronAPI && window.electronAPI.windowManager) {
+                        const result = await window.electronAPI.windowManager.createNewWindow('automation');
+                        if (result.success) {
+                            console.log('新窗口已创建:', result.windowId);
+                        } else {
+                            throw new Error('创建新窗口失败');
+                        }
+                    } else {
+                        // 后备方案：在普通浏览器中打开新标签页
+                        window.open('automation-dashboard.html', '_blank');
+                    }
+                } catch (error) {
+                    console.error('打开新窗口失败:', error);
+                    alert('打开新窗口失败，请重试');
+                }
+            }
+        }
+
+        // 全局函数
+        function removeAccount(accountId) {
+            if (window.toolsHome) {
+                window.toolsHome.removeAccount(accountId);
+            }
+        }
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            window.toolsHome = new ToolsHome();
+        });
+    </script>
+</body>
+</html>

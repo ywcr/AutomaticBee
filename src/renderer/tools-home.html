@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>工具集合站 - Electron版</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        color: #333;
+      }
+
+      .header {
+        background: rgba(255, 255, 255, 0.95);
+        padding: 1rem 2rem;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .logo {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #2c3e50;
+      }
+
+      .user-info {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+      }
+
+      .account-manager {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .account-item {
+        padding: 0.3rem 0.8rem;
+        background: #f8f9fa;
+        border-radius: 20px;
+        border: 1px solid #dee2e6;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: 0.85rem;
+      }
+
+      .account-item.active {
+        background: #007bff;
+        color: white;
+        border-color: #007bff;
+      }
+
+      .account-item:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+      }
+
+      .btn {
+        padding: 0.5rem 1rem;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+      }
+
+      .btn-primary {
+        background: #007bff;
+        color: white;
+      }
+
+      .btn-secondary {
+        background: #6c757d;
+        color: white;
+      }
+
+      .btn-success {
+        background: #28a745;
+        color: white;
+      }
+
+      .btn:hover {
+        opacity: 0.9;
+        transform: translateY(-1px);
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem;
+      }
+
+      .tools-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+        margin-top: 2rem;
+      }
+
+      .tool-card {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+        cursor: pointer;
+      }
+
+      .tool-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+      }
+
+      .tool-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        color: #007bff;
+      }
+
+      .tool-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: #2c3e50;
+      }
+
+      .tool-description {
+        color: #6c757d;
+        line-height: 1.6;
+        margin-bottom: 1.5rem;
+      }
+
+      .tool-features {
+        list-style: none;
+        margin-bottom: 1.5rem;
+      }
+
+      .tool-features li {
+        padding: 0.3rem 0;
+        color: #495057;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .tool-features li:before {
+        content: "✓";
+        color: #28a745;
+        font-weight: bold;
+      }
+
+      .tool-status {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .status-badge {
+        padding: 0.3rem 0.8rem;
+        border-radius: 15px;
+        font-size: 0.75rem;
+        font-weight: 500;
+      }
+
+      .status-ready {
+        background: #d4edda;
+        color: #155724;
+      }
+
+      .status-beta {
+        background: #fff3cd;
+        color: #856404;
+      }
+
+      .status-planned {
+        background: #f8d7da;
+        color: #721c24;
+      }
+
+      .title {
+        text-align: center;
+        color: white;
+        margin-bottom: 1rem;
+      }
+
+      .subtitle {
+        text-align: center;
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 1.1rem;
+      }
+
+      /* Modal 样式 */
+      .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.7);
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+      }
+
+      .modal-overlay.show {
+        display: flex;
+      }
+
+      .modal {
+        background: white;
+        border-radius: 12px;
+        padding: 0;
+        width: 90%;
+        max-width: 600px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        position: relative;
+      }
+
+      .modal-header {
+        padding: 2rem 2rem 1rem;
+        border-bottom: 1px solid #eee;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .modal-header h3 {
+        margin: 0;
+        color: #333;
+        font-size: 1.3rem;
+      }
+
+      .modal-close {
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        cursor: pointer;
+        color: #999;
+        line-height: 1;
+        padding: 0;
+        width: 24px;
+        height: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .modal-close:hover {
+        color: #333;
+      }
+
+      .modal-body {
+        padding: 2rem;
+      }
+
+      /* 全局加载遮罩 */
+      .global-loading {
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.45);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 10000;
+      }
+      .global-loading.show { display: flex; }
+      .gl-content {
+        background: #fff;
+        border-radius: 12px;
+        padding: 20px 28px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        min-width: 260px;
+        justify-content: center;
+      }
+      .gl-content i { color: #007bff; font-size: 20px; }
+      .gl-content span { color: #333; font-size: 14px; }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <div class="logo">
+        <i class="fas fa-tools"></i>
+        工具集合站
+      </div>
+      <!-- 工具站首页不需要账号管理 -->
+    </div>
+
+    <!-- 全局加载遮罩 -->
+    <div id="global-loading" class="global-loading" role="status" aria-live="polite" aria-label="正在加载">
+      <div class="gl-content">
+        <i class="fas fa-spinner fa-spin" aria-hidden="true"></i>
+        <span id="gl-text">正在启动精灵蜂工具...</span>
+      </div>
+    </div>
+
+    <div class="container">
+      <h1 class="title">欢迎使用工具集合站</h1>
+      <p class="subtitle">选择您需要的工具开始工作</p>
+
+      <div class="tools-grid">
+        <!-- 精灵蜂自动化工具 -->
+        <div class="tool-card" data-tool="jingling-automation">
+          <div class="tool-icon">
+            <i class="fas fa-robot"></i>
+          </div>
+          <div class="tool-title">精灵蜂任务自动化</div>
+          <div class="tool-description">
+            自动化创建联系人、渠道和问卷任务，支持Excel批量导入和多账号管理。
+          </div>
+          <ul class="tool-features">
+            <li>Excel文件解析</li>
+            <li>联系人自动创建</li>
+            <li>问卷任务批量生成</li>
+            <li>多账号并行处理</li>
+            <li>后台队列执行</li>
+          </ul>
+          <div class="tool-status">
+            <span class="status-badge status-ready">已就绪</span>
+            <button class="btn btn-primary">启动工具</button>
+          </div>
+        </div>
+
+        <!-- 竞品问卷工具（计划中） -->
+        <div class="tool-card" data-tool="competitor-survey">
+          <div class="tool-icon">
+            <i class="fas fa-chart-line"></i>
+          </div>
+          <div class="tool-title">竞品问卷分析</div>
+          <div class="tool-description">
+            自动分析竞品问卷数据，生成对比报告和趋势分析。
+          </div>
+          <ul class="tool-features">
+            <li>竞品数据采集</li>
+            <li>问卷结构分析</li>
+            <li>趋势对比报告</li>
+            <li>数据可视化</li>
+          </ul>
+          <div class="tool-status">
+            <span class="status-badge status-planned">开发计划中</span>
+            <button class="btn btn-secondary" disabled>即将推出</button>
+          </div>
+        </div>
+
+        <!-- 数据处理工具（Beta） -->
+        <div class="tool-card" data-tool="data-processor">
+          <div class="tool-icon">
+            <i class="fas fa-database"></i>
+          </div>
+          <div class="tool-title">数据处理助手</div>
+          <div class="tool-description">
+            通用数据清洗、转换和分析工具，支持多种格式的数据处理。
+          </div>
+          <ul class="tool-features">
+            <li>多格式数据导入</li>
+            <li>数据清洗和验证</li>
+            <li>格式转换</li>
+            <li>批量处理</li>
+          </ul>
+          <div class="tool-status">
+            <span class="status-badge status-beta">测试版</span>
+            <button class="btn btn-secondary">试用版本</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      class ToolsHome {
+        constructor() {
+          this.currentAccounts = [];
+          this.activeAccount = null;
+          this.isCreatingWindow = false; // 防止重复创建窗口
+          this.init();
+        }
+
+        init() {
+          this.loadAccounts();
+          this.bindEvents();
+        }
+        loadAccounts() {
+          // 工具站首页不需要加载账号
+          this.currentAccounts = [];
+        }
+
+        renderAccountList() {
+          const accountList = document.getElementById("account-list");
+          if (this.currentAccounts.length === 0) {
+            accountList.innerHTML =
+              '<span style="color: #6c757d;">未登录</span>';
+            return;
+          }
+
+          accountList.innerHTML = this.currentAccounts
+            .map(
+              (account, index) => `
+                    <div class="account-item ${account.active ? "active" : ""}" 
+                         data-account-id="${account.id}">
+                        ${
+                          account.phone ||
+                          account.username ||
+                          `账号${index + 1}`
+                        }
+                        <i class="fas fa-times" onclick="removeAccount('${
+                          account.id
+                        }')" 
+                           style="margin-left: 0.5rem; cursor: pointer;"></i>
+                    </div>
+                `
+            )
+            .join("");
+        }
+
+        bindEvents() {
+          console.log("绑定事件监听器");
+
+          // 工具卡片点击事件
+          const toolCards = document.querySelectorAll(".tool-card");
+          console.log("找到", toolCards.length, "个工具卡片");
+
+          toolCards.forEach((card) => {
+            card.addEventListener("click", (e) => {
+              console.log("工具卡片被点击:", card.dataset.tool);
+              if (!e.target.closest("button:disabled")) {
+                const tool = card.dataset.tool;
+                this.launchTool(tool);
+              }
+            });
+          });
+
+          // 工具站首页不需要添加账号功能
+          console.log("工具站首页无需账号管理");
+
+          // 账号切换
+          document.addEventListener("click", (e) => {
+            if (e.target.classList.contains("account-item")) {
+              this.switchAccount(e.target.dataset.accountId);
+            }
+          });
+        }
+
+        launchTool(toolName) {
+          console.log(`启动工具: ${toolName}`);
+
+          switch (toolName) {
+            case "jingling-automation":
+              // 直接创建新的精灵蜂工具标签
+              this.createJinglingTab();
+              break;
+
+            case "competitor-survey":
+              alert("竞品问卷分析工具正在开发中，敬请期待！");
+              break;
+
+            case "data-processor":
+              alert("数据处理助手测试版即将推出！");
+              break;
+
+            default:
+              alert("未知工具");
+          }
+        }
+
+        // 创建精灵蜂工具窗口 - 打开新的工具窗口而不是标签
+        async createJinglingTab() {
+          // 防止重复创建
+          if (this.isCreatingWindow) {
+            console.log('正在创建窗口，忽略重复请求');
+            return;
+          }
+          this.isCreatingWindow = true;
+
+          try {
+            console.log('开始创建精灵蜂工具窗口...');
+            // 显示全局加载遮罩
+            this.showLoading('正在启动精灵蜂工具...');
+            
+            if (window.electronAPI?.windowManager?.createToolWindow) {
+              // 使用新的窗口管理器创建工具窗口
+              const result = await window.electronAPI.windowManager.createToolWindow({
+                title: '精灵蜂工作台',
+                // 启动即进入登录页，登录成功后回到仪表盘
+                initialTab: '/login.html?returnTo=automation-dashboard.html',
+                initialTabTitle: '登录 - 精灵蜂',
+                initialTabIcon: 'fas fa-sign-in-alt',
+                width: 1400,
+                height: 900
+              });
+
+              if (result.success) {
+                console.log('精灵蜂工具窗口已创建:', result.windowId);
+                // 窗口创建成功，但等待页面加载完成
+                this.updateLoadingText('正在加载登录页面...');
+                
+                // 延时3秒后隐藏加载遮罩（给页面加载留出时间）
+                setTimeout(() => {
+                  this.hideLoading();
+                }, 3000);
+                // 工具窗口是独立窗口，首页保持可用
+              } else {
+                throw new Error(result.error || '创建窗口失败');
+              }
+            } else {
+              // 后备方案：在当前窗口中打开
+              console.warn('窗口管理器不可用，使用后备方案');
+              window.location.href = '/login.html?returnTo=automation-dashboard.html';
+            }
+          } catch (error) {
+            console.error('创建精灵蜂工具窗口失败:', error);
+            this.hideLoading();
+            // 后备方案：在当前窗口中打开
+            window.location.href = '/login.html?returnTo=automation-dashboard.html';
+          } finally {
+            // 重置标志
+            this.isCreatingWindow = false;
+          }
+        }
+
+        addAccount() {
+          // 在新标签中打开精灵蜂专用登录页面
+          if (window.electronAPI && window.electronAPI.tabManager) {
+            window.electronAPI.tabManager.createTab({
+              url: "/jingling-login.html",
+              title: "精灵蜂登录",
+              icon: "fas fa-sign-in-alt",
+            });
+          } else {
+            // 后备方案
+            window.location.href = "/jingling-login.html";
+          }
+        }
+
+        switchAccount(accountId) {
+          // 切换活跃账号
+          this.currentAccounts.forEach((account) => {
+            account.active = account.id === accountId;
+          });
+
+          localStorage.setItem(
+            "loginAccounts",
+            JSON.stringify(this.currentAccounts)
+          );
+          this.renderAccountList();
+
+          console.log(`切换到账号: ${accountId}`);
+        }
+
+        removeAccount(accountId) {
+          if (confirm("确定要移除这个账号吗？")) {
+            this.currentAccounts = this.currentAccounts.filter(
+              (account) => account.id !== accountId
+            );
+            localStorage.setItem(
+              "loginAccounts",
+              JSON.stringify(this.currentAccounts)
+            );
+            this.renderAccountList();
+          }
+        }
+
+        // 显示/隐藏加载遮罩
+        showLoading(text = '正在加载...') {
+          const overlay = document.getElementById('global-loading');
+          const txt = document.getElementById('gl-text');
+          if (txt) txt.textContent = text;
+          if (overlay) overlay.classList.add('show');
+        }
+        updateLoadingText(text) {
+          const txt = document.getElementById('gl-text');
+          if (txt) txt.textContent = text;
+        }
+        hideLoading() {
+          const overlay = document.getElementById('global-loading');
+          if (overlay) overlay.classList.remove('show');
+        }
+      }
+
+      // 全局函数
+      function removeAccount(accountId) {
+        if (window.toolsHome) {
+          window.toolsHome.removeAccount(accountId);
+        }
+      }
+
+      // 初始化
+      document.addEventListener("DOMContentLoaded", () => {
+        try {
+          console.log("初始化工具站页面");
+          window.toolsHome = new ToolsHome();
+          console.log("工具站初始化完成");
+        } catch (error) {
+          console.error("工具站初始化失败:", error);
+          alert("页面初始化失败，请检查控制台错误信息");
+        }
+      });
+    </script>
+  </body>
+</html>

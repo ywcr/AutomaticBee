@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>简单测试页面</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255,255,255,0.1);
+            padding: 30px;
+            border-radius: 12px;
+        }
+        .btn {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            margin: 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .btn:hover {
+            background: #0056b3;
+        }
+        .log {
+            background: rgba(0,0,0,0.3);
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 6px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>简单功能测试</h1>
+        <p>这个页面用于测试基础的JavaScript功能。</p>
+        
+        <div class="buttons">
+            <button class="btn" onclick="testBasic()">测试基础功能</button>
+            <button class="btn" onclick="testLocalStorage()">测试本地存储</button>
+            <button class="btn" onclick="testAPI()">测试API连接</button>
+            <button class="btn" onclick="clearLog()">清空日志</button>
+            <a href="/tools-home.html" class="btn">返回工具站</a>
+        </div>
+        
+        <div id="log" class="log">等待测试...\n</div>
+    </div>
+
+    <script>
+        function log(message) {
+            const logEl = document.getElementById('log');
+            const timestamp = new Date().toLocaleTimeString();
+            logEl.textContent += `[${timestamp}] ${message}\n`;
+            logEl.scrollTop = logEl.scrollHeight;
+        }
+
+        function clearLog() {
+            document.getElementById('log').textContent = '';
+            log('日志已清空');
+        }
+
+        function testBasic() {
+            log('开始基础功能测试...');
+            
+            try {
+                // 测试基本JavaScript功能
+                const arr = [1, 2, 3];
+                const result = arr.map(x => x * 2);
+                log(`数组测试: [${result.join(', ')}]`);
+                
+                // 测试DOM操作
+                const testDiv = document.createElement('div');
+                testDiv.textContent = 'test';
+                log(`DOM操作测试: ${testDiv.textContent}`);
+                
+                // 测试Promise
+                Promise.resolve('异步测试').then(value => {
+                    log(`Promise测试: ${value}`);
+                });
+                
+                log('基础功能测试完成 ✓');
+            } catch (error) {
+                log(`基础功能测试失败: ${error.message}`);
+            }
+        }
+
+        function testLocalStorage() {
+            log('开始本地存储测试...');
+            
+            try {
+                // 写入测试数据
+                const testData = { test: true, timestamp: Date.now() };
+                localStorage.setItem('test_data', JSON.stringify(testData));
+                
+                // 读取测试数据
+                const readData = JSON.parse(localStorage.getItem('test_data'));
+                log(`本地存储写入/读取测试: ${JSON.stringify(readData)}`);
+                
+                // 清理测试数据
+                localStorage.removeItem('test_data');
+                log('本地存储测试完成 ✓');
+            } catch (error) {
+                log(`本地存储测试失败: ${error.message}`);
+            }
+        }
+
+        async function testAPI() {
+            log('开始API连接测试...');
+            
+            try {
+                // 测试健康检查端点
+                const response = await fetch('/api/health');
+                if (response.ok) {
+                    const data = await response.json();
+                    log(`健康检查API: ${data.message}`);
+                } else {
+                    log(`健康检查API失败: ${response.status}`);
+                }
+                
+                log('API测试完成 ✓');
+            } catch (error) {
+                log(`API测试失败: ${error.message}`);
+            }
+        }
+
+        // 页面加载完成后自动运行基础测试
+        document.addEventListener('DOMContentLoaded', () => {
+            log('页面加载完成');
+            log('可以点击按钮进行各项测试');
+        });
+    </script>
+</body>
+</html>

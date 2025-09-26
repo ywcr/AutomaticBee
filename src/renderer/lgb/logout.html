@@ -1,0 +1,40 @@
+
+
+
+<!DOCTYPE html>
+<html style="height:100%">
+<head>
+    <title>精灵蜂</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="referrer" content="never">
+    <meta charset="UTF-8">
+</head>
+
+<body style="display:none">
+</body>
+
+
+<script src="layui/layui.js"></script>
+<script>
+    layui.use(['jquery'], function () {
+        var device = layui.device("mobile");
+        let hostname = window.location.hostname;
+        // if(hostname=="trt.zxyy.ltd"){
+        if (hostname.indexOf('trt') !== -1) {
+            location.href = "trtLogin/index.html";
+        } else {
+            if (device.mobile || device.weixin) {
+                location.href = "mobile/index.jsp"
+            } else {
+                if (window.screen.width <= 750) {
+                    location.href = "mobile/app.jsp"
+                } else {
+                    localStorage.removeItem('aboutUsTab')
+                    location.href = "login/login.html";
+                }
+            }
+        }
+
+    })
+</script>
+</html>

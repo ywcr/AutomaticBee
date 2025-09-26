@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>自动化任务管理</title>
+    <link rel="stylesheet" href="styles/automation-tasks.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="automation-container">
+        <!-- 头部导航 -->
+        <header class="automation-header">
+            <div class="header-left">
+                <button id="back-to-dashboard" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> 返回仪表板
+                </button>
+                <h1>自动化任务管理</h1>
+            </div>
+            <div class="header-right">
+                <div class="user-info">
+                    <span id="current-user">未登录</span>
+                    <button id="logout-btn" class="btn btn-outline">登出</button>
+                </div>
+            </div>
+        </header>
+
+        <!-- 任务类型选择 -->
+        <div class="task-type-selector">
+            <div class="task-type-tabs">
+                <button class="task-tab active" data-task="liuwei_patient">
+                    <i class="fas fa-user-injured"></i>
+                    六味患者问卷
+                </button>
+                <button class="task-tab" data-task="xihuang_consumer">
+                    <i class="fas fa-users"></i>
+                    西黄消费者问卷
+                </button>
+            </div>
+        </div>
+
+        <!-- 主要内容区域 -->
+        <main class="automation-main">
+            <!-- 六味患者问卷任务 -->
+            <div id="liuwei_patient" class="task-content active">
+                <div class="task-header">
+                    <h2>六味患者问卷自动化</h2>
+                    <div class="task-status">
+                        <span class="status-indicator" id="liuwei-status">就绪</span>
+                    </div>
+                </div>
+
+                <div class="task-panels">
+                    <!-- 数据上传面板 -->
+                    <div class="panel">
+                        <h3><i class="fas fa-upload"></i> 数据上传</h3>
+                        <div class="upload-area" id="liuwei-upload-area">
+                            <div class="upload-icon">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                            </div>
+                            <p>拖拽Excel文件到此处或点击选择文件</p>
+                            <input type="file" id="liuwei-file-input" accept=".xlsx,.xls" hidden>
+                            <button class="btn btn-primary" onclick="document.getElementById('liuwei-file-input').click()">
+                                选择文件
+                            </button>
+                        </div>
+                        <div class="file-info" id="liuwei-file-info" style="display: none;">
+                            <div class="file-details">
+                                <i class="fas fa-file-excel"></i>
+                                <span class="file-name"></span>
+                                <span class="file-size"></span>
+                            </div>
+                            <button class="btn btn-danger btn-sm" id="liuwei-remove-file">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 数据预览面板 -->
+                    <div class="panel">
+                        <h3><i class="fas fa-table"></i> 数据预览</h3>
+                        <div class="data-preview" id="liuwei-data-preview">
+                            <p class="no-data">请先上传Excel文件</p>
+                        </div>
+                    </div>
+
+                    <!-- 指派人管理面板 -->
+                    <div class="panel">
+                        <h3><i class="fas fa-users-cog"></i> 指派人管理</h3>
+                        <div class="assignee-list" id="liuwei-assignee-list">
+                            <!-- 动态加载指派人列表 -->
+                        </div>
+                    </div>
+
+                    <!-- 执行控制面板 -->
+                    <div class="panel">
+                        <h3><i class="fas fa-play-circle"></i> 执行控制</h3>
+                        <div class="execution-controls">
+                            <div class="control-buttons">
+                                <button id="liuwei-start-contacts" class="btn btn-success" disabled>
+                                    <i class="fas fa-user-plus"></i> 创建联系人
+                                </button>
+                                <button id="liuwei-start-questionnaires" class="btn btn-warning" disabled>
+                                    <i class="fas fa-file-alt"></i> 创建问卷
+                                </button>
+                                <button id="liuwei-start-all" class="btn btn-primary" disabled>
+                                    <i class="fas fa-rocket"></i> 全部执行
+                                </button>
+                            </div>
+                            <div class="execution-settings">
+                                <div class="setting-group">
+                                    <label>并发数量:</label>
+                                    <input type="number" id="liuwei-concurrency" min="1" max="5" value="1">
+                                </div>
+                                <div class="setting-group">
+                                    <label>步骤延迟(ms):</label>
+                                    <input type="number" id="liuwei-delay" min="500" max="10000" value="1500">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 进度监控面板 -->
+                    <div class="panel">
+                        <h3><i class="fas fa-chart-line"></i> 进度监控</h3>
+                        <div class="progress-monitor" id="liuwei-progress">
+                            <div class="progress-bar-container">
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 0%"></div>
+                                </div>
+                                <div class="progress-text">0/0</div>
+                            </div>
+                            <div class="progress-details">
+                                <div class="detail-item">
+                                    <span class="label">当前任务:</span>
+                                    <span class="value">等待开始</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="label">成功:</span>
+                                    <span class="value success">0</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="label">失败:</span>
+                                    <span class="value error">0</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 西黄消费者问卷任务 -->
+            <div id="xihuang_consumer" class="task-content">
+                <div class="task-header">
+                    <h2>西黄消费者问卷自动化</h2>
+                    <div class="task-status">
+                        <span class="status-indicator" id="xihuang-status">就绪</span>
+                    </div>
+                </div>
+
+                <div class="task-panels">
+                    <!-- 类似的面板结构，但ID前缀为xihuang -->
+                    <div class="panel">
+                        <h3><i class="fas fa-upload"></i> 数据上传</h3>
+                        <div class="upload-area" id="xihuang-upload-area">
+                            <div class="upload-icon">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                            </div>
+                            <p>拖拽Excel文件到此处或点击选择文件</p>
+                            <input type="file" id="xihuang-file-input" accept=".xlsx,.xls" hidden>
+                            <button class="btn btn-primary" onclick="document.getElementById('xihuang-file-input').click()">
+                                选择文件
+                            </button>
+                        </div>
+                        <div class="file-info" id="xihuang-file-info" style="display: none;">
+                            <div class="file-details">
+                                <i class="fas fa-file-excel"></i>
+                                <span class="file-name"></span>
+                                <span class="file-size"></span>
+                            </div>
+                            <button class="btn btn-danger btn-sm" id="xihuang-remove-file">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 其他面板... -->
+                    <div class="panel">
+                        <h3><i class="fas fa-info-circle"></i> 功能说明</h3>
+                        <div class="info-content">
+                            <p><strong>西黄消费者问卷</strong>需要先创建消费者联系人和渠道信息，然后才能创建问卷。</p>
+                            <ul>
+                                <li>1. 上传包含消费者信息的Excel文件</li>
+                                <li>2. 系统自动创建消费者联系人</li>
+                                <li>3. 系统自动创建对应的渠道信息</li>
+                                <li>4. 最后创建消费者问卷</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- 日志面板 -->
+        <div class="log-panel" id="log-panel">
+            <div class="log-header">
+                <h3><i class="fas fa-terminal"></i> 执行日志</h3>
+                <div class="log-controls">
+                    <button id="clear-logs" class="btn btn-sm btn-secondary">清空日志</button>
+                    <button id="toggle-logs" class="btn btn-sm btn-primary">
+                        <i class="fas fa-chevron-up"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="log-content" id="log-content">
+                <div class="log-entry info">
+                    <span class="timestamp">[2024-01-01 12:00:00]</span>
+                    <span class="message">系统初始化完成</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 脚本引入 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="scripts/automation-tasks.js"></script>
+</body>
+</html>
