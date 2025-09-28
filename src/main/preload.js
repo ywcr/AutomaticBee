@@ -39,6 +39,9 @@ contextBridge.exposeInMainWorld("electronAPI", {
   // 调用系统对话框选择Excel并交由主进程解析
   selectAndProcessExcel: () => ipcRenderer.invoke("select-excel-file"),
 
+  // IPC 通信方法（用于工具间通信）
+  send: (channel, data) => ipcRenderer.send(channel, data),
+
   // 自动化相关 API
   automation: {
     // 认证状态

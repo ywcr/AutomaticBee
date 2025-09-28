@@ -388,6 +388,28 @@
             <button class="btn btn-secondary">试用版本</button>
           </div>
         </div>
+
+        <!-- Excel审核工具 -->
+        <div class="tool-card" data-tool="excel-review">
+          <div class="tool-icon">
+            <i class="fas fa-file-excel"></i>
+          </div>
+          <div class="tool-title">Excel审核工具</div>
+          <div class="tool-description">
+            高性能的Excel数据验证与图片分析工具，支持大文件处理和复杂验证规则。
+          </div>
+          <ul class="tool-features">
+            <li>Excel数据验证</li>
+            <li>图片清晰度检测</li>
+            <li>重复图片识别</li>
+            <li>大文件支持</li>
+            <li>实时进度显示</li>
+          </ul>
+          <div class="tool-status">
+            <span class="status-badge status-ready">已就绪</span>
+            <button class="btn btn-success">启动工具</button>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -482,6 +504,10 @@
               alert("数据处理助手测试版即将推出！");
               break;
 
+            case "excel-review":
+              this.launchExcelReviewTool();
+              break;
+
             default:
               alert("未知工具");
           }
@@ -538,6 +564,38 @@
             window.location.href = '/login.html?returnTo=automation-dashboard.html';
           } finally {
             // 重置标志
+            this.isCreatingWindow = false;
+          }
+        }
+
+        // 启动Excel审核工具
+        async launchExcelReviewTool() {
+          if (this.isCreatingWindow) {
+            console.log('正在创建窗口，忽略重复请求');
+            return;
+          }
+          this.isCreatingWindow = true;
+
+          try {
+            console.log('开始创建Excel审核工具窗口...');
+            this.showLoading('正在启动Excel审核工具...');
+
+            if (window.electronAPI?.send) {
+              // 使用IPC通信打开Excel审核工具窗口
+              window.electronAPI.send('open-tool', 'excel-review');
+              
+              // 给窗口创建时间
+              setTimeout(() => {
+                this.hideLoading();
+              }, 2000);
+            } else {
+              throw new Error('Electron API 不可用');
+            }
+          } catch (error) {
+            console.error('启动Excel审核工具失败:', error);
+            this.hideLoading();
+            alert('启动Excel审核工具失败，请检查控制台错误信息');
+          } finally {
             this.isCreatingWindow = false;
           }
         }

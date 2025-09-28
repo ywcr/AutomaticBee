@@ -13,6 +13,7 @@ const {
     DEFAULT_WINDOW_WIDTH,
     DEFAULT_WINDOW_HEIGHT
 } = require('../config/LayoutConstants');
+const { tabManagerRegistry } = require('../managers/TabManagerRegistry');
 
 class WindowFactory {
     constructor(store) {

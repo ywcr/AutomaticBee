@@ -327,6 +327,33 @@ function createMenu() {
     Menu.setApplicationMenu(menu);
 }
 
+// 创建Excel审核工具窗口
+function createExcelReviewWindow() {
+    const win = new BrowserWindow({
+        width: 1280,
+        height: 900,
+        webPreferences: {
+            preload: path.resolve(__dirname, './preloads/excel-review-preload.js'),
+            contextIsolation: true,
+            nodeIntegration: false,
+            devTools: true,
+        },
+        title: 'Excel 审核工具',
+        icon: path.join(__dirname, '../assets/icon.png'), // 如果有图标的话
+    });
+
+    // 加载静态导出的 index-electron.html
+    const filePath = path.resolve(__dirname, '../renderer/tools/excel-review/index-electron.html');
+    win.loadFile(filePath);
+
+    // 打开开发者工具（在开发环境下）
+    if (process.env.NODE_ENV === 'development') {
+        win.webContents.openDevTools();
+    }
+
+    return win;
+}
+
 // 初始化自动化模块
 async function initAutomationModules() {
     try {
@@ -644,6 +671,76 @@ function registerAutomationIPCHandlers() {
     ipcMain.handle('import-config', async (event, filePath, merge) => {
         if (!configManager) throw new Error('配置管理器未初始化');
         return await configManager.importConfig(filePath, merge);
+    });
+
+    // Excel审核工具相关
+    ipcMain.on('open-tool', (event, toolName) => {
+        if (toolName === 'excel-review') {
+            createExcelReviewWindow();
+        }
+    });
+
+    // Excel审核工具文件对话框
+    ipcMain.handle('dialog:openFile', async () => {
+        const { dialog } = require('electron');
+        const result = await dialog.showOpenDialog({
+            properties: ['openFile'],
+            filters: [
+                { name: 'Excel Files', extensions: ['xlsx', 'xlsm', 'xlsb'] },
+                { name: 'All Files', extensions: ['*'] },
+            ],
+        });
+        
+        if (result.canceled || !result.filePaths?.[0]) {
+            return null;
+        }
+        
+        return result.filePaths[0]; // 返回文件路径
+    });
+
+    // Excel审核工具验证任务
+    ipcMain.handle('excel:start-validation', async (event, payload) => {
+        const { filePath, options } = payload || {};
+        if (!filePath) {
+            throw new Error('filePath is required');
+        }
+
+        const { Worker } = require('worker_threads');
+        const workerPath = path.resolve(__dirname, './workers/excel-validation-worker.js');
+
+        return new Promise((resolve, reject) => {
+            const worker = new Worker(workerPath, {
+                workerData: { filePath, options },
+            });
+
+            // 监听 worker 事件并转发给渲染进程
+            worker.on('message', (msg) => {
+                if (!msg || typeof msg !== 'object') return;
+                
+                if (msg.type === 'progress') {
+                    event.sender.send('excel:update-progress', msg);
+                } else if (msg.type === 'error') {
+                    event.sender.send('excel:error', msg);
+                } else if (msg.type === 'done') {
+                    event.sender.send('excel:done', msg.result);
+                    resolve(msg.result);
+                }
+            });
+
+            worker.on('error', (err) => {
+                const errorMsg = { message: err?.message || String(err) };
+                event.sender.send('excel:error', errorMsg);
+                reject(err);
+            });
+
+            worker.on('exit', (code) => {
+                if (code !== 0) {
+                    const err = new Error(`Worker stopped with exit code ${code}`);
+                    event.sender.send('excel:error', { message: err.message });
+                    reject(err);
+                }
+            });
+        });
     });
 }
 

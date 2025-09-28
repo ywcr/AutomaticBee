@@ -119,3 +119,6 @@ Thumbs.db
 *.asar
 app/
 release/
+
+# Excel review data (keep local only)
+src/renderer/tools/excel-review/data/

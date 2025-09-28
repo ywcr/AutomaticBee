@@ -5,8 +5,8 @@
 
 const { BrowserView } = require('electron');
 const path = require('path');
+const fs = require('fs');
 const { HEADER_HEIGHT } = require('../config/LayoutConstants');
-const HEADER_HEIGHT = 40;
 
 class HeaderViewManager {
     constructor(window, tabManager) {
